@@ -111,9 +111,10 @@
   <footer>&copy; 2025 Dein Friseursalon</footer>
 
   <script>
-    // <<< HIER DEINE /exec-URL einsetzen!
+    // ***** HIER DEINE /exec-URL EINTRAGEN *****
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw41Pmg5QqbE5H545jo4RbU-PZXcJTp2YTepbRajAIfN4i3fK7-oQ93g5OItROmo4JY/exec";
 
+    // Services
     const services = [
       { id:1, name:"Maschinenhaarschnitt (Herren)", preis:"11 €", dauer:20 },
       { id:2, name:"Trockenschnitt (Herren)", preis:"15 €", dauer:25 },
@@ -232,9 +233,10 @@
       document.getElementById("phoneErr").style.display = phone ? "none" : "block";
       if(!name || !phone) return;
 
+      // Sende JSON – dein Backend akzeptiert JSON **und** Form-POST
       const payload = {
         action: "bookAppointment",
-        service: JSON.stringify(selService),  // als String für Form-POST
+        service: selService,
         date: selDate.toISOString().split("T")[0],
         time: selTime,
         name, phone,
@@ -242,11 +244,12 @@
         notes: document.getElementById("notes").value.trim()
       };
 
-      const form = new URLSearchParams();
-      Object.entries(payload).forEach(([k,v])=>form.append(k, v));
-
       try{
-        const r = await fetch(SCRIPT_URL,{ method:"POST", body: form });
+        const r = await fetch(SCRIPT_URL,{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body: JSON.stringify(payload)
+        });
         const res = await r.json();
         if(res && res.success){ setStep(5); }
         else { alert("Fehler: " + (res && res.message ? res.message : "Unbekannter Fehler")); }
