@@ -1,287 +1,192 @@
-# Create a downloadable HTML file for the user with the polished, salon-style UI
-html_content = r"""<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Premium Salon – Terminbuchung</title>
-<meta name="theme-color" content="#ff7a59">
-<style>
-  :root{
-    --bg:#fff7f2;
-    --panel:#ffffff;
-    --primary:#ff7a59;      /* warm salon coral */
-    --primary-2:#ff5c37;
-    --accent:#7c3aed;       /* lila akzent */
-    --ok:#047857;
-    --err:#dc2626;
-    --text:#1f2937;
-    --muted:#6b7280;
-    --line:#e5e7eb;
-    --shadow: 0 10px 28px rgba(0,0,0,.10), 0 2px 6px rgba(0,0,0,.06);
-  }
-  html,body{height:100%}
-  *{box-sizing:border-box}
-  body{
-    margin:0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    color:var(--text);
-    background:
-      radial-gradient(900px 300px at 10% -10%, #ffe4d6 0%, transparent 60%),
-      radial-gradient(900px 300px at 90% 110%, #efd6ff 0%, transparent 60%),
-      var(--bg);
-    display:grid; place-items:center; padding:18px;
-  }
-  .app{
-    width:100%; max-width:720px;
-    background:linear-gradient(180deg, #ffffff 0%, #fffaf7 100%);
-    border:1px solid var(--line);
-    border-radius:22px;
-    box-shadow: var(--shadow);
-    overflow:hidden;
-  }
-  .topbar{
-    background:linear-gradient(120deg, var(--primary) 0%, #ffa57f 100%);
-    color:#fff; padding:18px 20px;
-    display:flex; align-items:center; gap:12px;
-  }
-  .logo{width:44px;height:44px;border-radius:14px;background:#ffffff22;display:grid;place-items:center;font-size:22px}
-  .brand{font-weight:800; letter-spacing:.3px}
-  .sub{font-size:12px; opacity:.95}
-  .section{padding:16px 18px; border-bottom:1px solid var(--line); background:var(--panel)}
-  .section:last-child{border-bottom:0}
-  h2{margin:0 0 10px; font-size:18px}
-  label{font-weight:650; display:block; margin:10px 0 6px}
-  select,input,textarea{
-    width:100%; padding:12px 14px; border:1px solid var(--line); border-radius:12px;
-    font-size:16px; background:#fff; outline:none;
-  }
-  select:focus,input:focus,textarea:focus{border-color:#f59e0b; box-shadow:0 0 0 3px #fde68a80}
-  .muted{color:var(--muted); font-size:13px}
-  .row{display:flex; gap:10px; flex-wrap:wrap}
-  .col{flex:1 1 220px}
-  .slots{display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px; margin-top:10px}
-  .slot{
-    padding:12px; border:1px solid var(--line); border-radius:12px; text-align:center; background:#fff;
-    cursor:pointer; transition:.15s ease-in-out; user-select:none; font-weight:600;
-  }
-  .slot:hover{border-color:#f59e0b; transform:translateY(-1px)}
-  .slot.selected{background:var(--primary); color:#fff; border-color:var(--primary)}
-  .btn{
-    width:100%; display:inline-flex; justify-content:center; align-items:center; gap:8px;
-    padding:14px 16px; border:0; border-radius:12px; background:linear-gradient(120deg, var(--primary) 0%, var(--primary-2) 100%);
-    color:#fff; font-weight:800; letter-spacing:.2px; cursor:pointer; box-shadow:var(--shadow);
-  }
-  .btn:active{transform:translateY(1px)}
-  .toolbar{display:flex; gap:10px; margin-top:10px; flex-wrap:wrap}
-  .ghost{background:#fff; color:var(--text); border:1px solid var(--line); box-shadow:none}
-  .pill{display:inline-flex; align-items:center; gap:6px; background:#fff0ea; color:#9a3412;
-        padding:6px 10px; border-radius:999px; border:1px solid #ffd4c6; font-size:12px; font-weight:700;}
-  .status{margin-top:10px; min-height:20px; font-weight:700}
-  .ok{color:var(--ok)} .err{color:var(--err)} .info{color:#374151}
-  .mini-note{font-size:12px; color:#6b7280; margin-top:6px}
-  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-  @media (max-width:560px){ .grid-2{grid-template-columns:1fr} }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminbuchung | Dein Friseursalon</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {--primary:#8b7355;--secondary:#d4af37;--light:#f8f5f0;--dark:#333;--gray:#e0e0e0;--success:#4caf50;--error:#f44336;}
+    body {margin:0;font-family:'Segoe UI',sans-serif;background:var(--light);color:var(--dark);}
+    header {background:linear-gradient(to right,var(--primary),var(--secondary));padding:1rem;color:white;text-align:center;}
+    .container {max-width:900px;margin:auto;padding:1rem;}
+    .step {display:none;}
+    .step.active {display:block;animation:fadeIn .3s;}
+    @keyframes fadeIn {from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+    .services-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;}
+    .service-card {border:1px solid var(--gray);padding:1rem;border-radius:8px;cursor:pointer;transition:.3s;}
+    .service-card:hover {border-color:var(--primary);transform:translateY(-3px);}
+    .service-card.selected {background:rgba(139,115,85,0.1);border-color:var(--primary);}
+    button {padding:.7rem 1.2rem;border:none;border-radius:6px;cursor:pointer;font-weight:600;}
+    .btn-primary {background:var(--primary);color:white;}
+    .btn-primary:disabled {background:var(--gray);cursor:not-allowed;}
+    .btn-secondary {background:var(--gray);}
+    .dates,.times {display:flex;flex-wrap:wrap;gap:.5rem;}
+    .dates button,.times button {flex:1 0 120px;}
+    label{display:block;margin:.5rem 0 .2rem;font-weight:600;}
+    input,textarea{width:100%;padding:.5rem;border:1px solid var(--gray);border-radius:5px;}
+    .error{color:var(--error);font-size:.9rem;display:none;}
+    .confirmation {text-align:center;padding:2rem;background:rgba(76,175,80,0.1);border-radius:10px;}
+    .confirmation i {font-size:3rem;color:var(--success);}
+    footer {background:var(--dark);color:white;text-align:center;padding:1rem;margin-top:2rem;}
+  </style>
 </head>
 <body>
-  <main class="app" role="application" aria-label="Premium Salon Terminbuchung">
-    <header class="topbar">
-      <div class="logo" aria-hidden="true">✂️</div>
-      <div>
-        <div class="brand">Premium Salon</div>
-        <div class="sub">Schnell & freundlich buchen</div>
+  <header><h1>Termin online buchen</h1></header>
+  <div class="container">
+
+    <!-- Schritt 1 -->
+    <div id="step1" class="step active">
+      <h2>1. Service auswählen</h2>
+      <div class="services-grid" id="services"></div>
+      <button class="btn-primary" id="toStep2" disabled>Weiter</button>
+    </div>
+
+    <!-- Schritt 2 -->
+    <div id="step2" class="step">
+      <h2>2. Datum auswählen</h2>
+      <div class="dates" id="dates"></div>
+      <button class="btn-secondary" onclick="goToStep(1)">Zurück</button>
+      <button class="btn-primary" id="toStep3" disabled>Weiter</button>
+    </div>
+
+    <!-- Schritt 3 -->
+    <div id="step3" class="step">
+      <h2>3. Uhrzeit auswählen</h2>
+      <div class="times" id="times"></div>
+      <button class="btn-secondary" onclick="goToStep(2)">Zurück</button>
+      <button class="btn-primary" id="toStep4" disabled>Weiter</button>
+    </div>
+
+    <!-- Schritt 4 -->
+    <div id="step4" class="step">
+      <h2>4. Ihre Daten</h2>
+      <label for="name">Name *</label>
+      <input id="name"><div class="error" id="nameErr">Bitte Name eingeben</div>
+      <label for="phone">Telefon *</label>
+      <input id="phone"><div class="error" id="phoneErr">Bitte Telefonnummer eingeben</div>
+      <label for="email">E-Mail</label><input id="email">
+      <label for="notes">Notizen</label><textarea id="notes"></textarea>
+      <button class="btn-secondary" onclick="goToStep(3)">Zurück</button>
+      <button class="btn-primary" onclick="book()">Termin buchen</button>
+    </div>
+
+    <!-- Schritt 5 -->
+    <div id="step5" class="step">
+      <div class="confirmation">
+        <i class="fas fa-check-circle"></i>
+        <h2>Termin erfolgreich gebucht!</h2>
+        <p>Wir freuen uns auf Ihren Besuch.</p>
       </div>
-    </header>
+      <button class="btn-primary" onclick="goToStep(1)">Neuen Termin buchen</button>
+    </div>
+  </div>
 
-    <!-- Leistung -->
-    <section class="section">
-      <h2>1) Leistung wählen</h2>
-      <select id="service" aria-label="Dienstleistung"></select>
-      <div id="svcInfo" class="muted mini-note"></div>
-      <div class="toolbar">
-        <span class="pill">Do/Fr 12–18</span>
-        <span class="pill">Sa 11–15</span>
-        <button class="btn ghost" id="resetBtn" type="button">Zurücksetzen</button>
-      </div>
-    </section>
+  <footer>&copy; 2025 Dein Friseursalon</footer>
 
-    <!-- Datum -->
-    <section class="section">
-      <h2>2) Datum wählen</h2>
-      <input type="date" id="date" aria-label="Datum">
-      <div class="mini-note">Nur Donnerstag, Freitag oder Samstag sind buchbar.</div>
-    </section>
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw41Pmg5QqbE5H545jo4RbU-PZXcJTp2YTepbRajAIfN4i3fK7-oQ93g5OItROmo4JY/exec";
 
-    <!-- Uhrzeit -->
-    <section class="section" id="timeSec" style="display:none">
-      <h2>3) Uhrzeit wählen</h2>
-      <div id="slots" class="slots" role="listbox" aria-label="Freie Zeiten">
-        <div class="muted">Bitte zuerst Datum wählen …</div>
-      </div>
-    </section>
+    // Alle 16 Services
+    const services = [
+      {id:1,name:"Maschinenhaarschnitt (Herren)",preis:"11 €",dauer:20},
+      {id:2,name:"Trockenschnitt (Herren)",preis:"15 €",dauer:25},
+      {id:3,name:"Waschen, Schneiden (Herren)",preis:"17 €",dauer:30},
+      {id:4,name:"Waschen, Schneiden, Föhnen (Herren)",preis:"19,50 €",dauer:35},
+      {id:5,name:"Trockenschnitt (Damen)",preis:"19 €",dauer:30},
+      {id:6,name:"Waschen, Schneiden (Damen)",preis:"21 €",dauer:35},
+      {id:7,name:"Waschen, Schneiden, Föhnen (kurz)",preis:"23 €",dauer:45},
+      {id:8,name:"Waschen, Schneiden, Föhnen (mittel)",preis:"28 €",dauer:60},
+      {id:9,name:"Waschen, Schneiden, Föhnen (lang)",preis:"33 €",dauer:90},
+      {id:10,name:"Ansatzfarbe",preis:"43 €",dauer:90},
+      {id:11,name:"Foliensträhnen XS (bis 15)",preis:"29 €",dauer:60},
+      {id:12,name:"Foliensträhnen S (halber Kopf)",preis:"49 €",dauer:90},
+      {id:13,name:"Foliensträhnen M (ganzer Kopf)",preis:"69 €",dauer:120},
+      {id:14,name:"Tönung",preis:"35 €",dauer:60},
+      {id:15,name:"Glossing",preis:"15 €",dauer:20},
+      {id:16,name:"Conditioner / Pflege",preis:"+5 €",dauer:10}
+    ];
 
-    <!-- Daten & Buchen -->
-    <section class="section" id="dataSec" style="display:none">
-      <h2>4) Deine Daten</h2>
-      <div class="grid-2">
-        <div>
-          <label for="name">Name *</label>
-          <input id="name" placeholder="Max Mustermann" autocomplete="name">
-        </div>
-        <div>
-          <label for="phone">Telefon (optional)</label>
-          <input id="phone" placeholder="0176…" autocomplete="tel">
-        </div>
-      </div>
-      <label for="note" style="margin-top:10px">Bemerkung (optional)</label>
-      <textarea id="note" rows="3" placeholder="z. B. Haarlänge, Wünsche …"></textarea>
-      <button class="btn" id="bookBtn" style="margin-top:12px">Jetzt Termin buchen</button>
-      <div id="status" class="status info" role="status" aria-live="polite"></div>
-      <div class="mini-note">Dein Kalender bleibt privat. Es werden nur freie Slots angezeigt.</div>
-    </section>
-  </main>
+    let selService=null, selDate=null, selTime=null;
 
-<script>
-/* ====== BACKEND-URL (deine Google Apps Script /exec) ====== */
-const API = 'https://script.google.com/macros/s/AKfycbzJHUHZ6Vwen3kwHbMRr8c9oEXv5kH6LCj9-RRXSe4JuNB-sDcuvymiRGFy11eOACq-/exec';
-
-/* ====== Leistungen (Name, Preis, Dauer in Minuten) ====== */
-const SERVICES = [
-  { id:1,  name:'Maschinenhaarschnitt (Herren)',              preis:'11 €',    dauer:20 },
-  { id:2,  name:'Trockenschnitt (Herren)',                     preis:'15 €',    dauer:25 },
-  { id:3,  name:'Waschen, Schneiden (Herren)',                 preis:'17 €',    dauer:30 },
-  { id:4,  name:'Waschen, Schneiden, Föhnen (Herren)',         preis:'19,50 €', dauer:35 },
-  { id:5,  name:'Trockenschnitt (Damen)',                      preis:'19 €',    dauer:30 },
-  { id:6,  name:'Waschen, Schneiden (Damen)',                  preis:'21 €',    dauer:35 },
-  { id:7,  name:'Waschen, Schneiden, Föhnen (kurz)',           preis:'23 €',    dauer:45 },
-  { id:8,  name:'Waschen, Schneiden, Föhnen (mittel)',         preis:'28 €',    dauer:60 },
-  { id:9,  name:'Waschen, Schneiden, Föhnen (lang)',           preis:'33 €',    dauer:90 },
-  { id:10, name:'Ansatzfarbe',                                  preis:'43 €',    dauer:90 },
-  { id:11, name:'Foliensträhnen XS (bis 15)',                   preis:'29 €',    dauer:60 },
-  { id:12, name:'Foliensträhnen S (halber Kopf)',               preis:'49 €',    dauer:90 },
-  { id:13, name:'Foliensträhnen M (ganzer Kopf)',               preis:'69 €',    dauer:120 },
-  { id:14, name:'Tönung',                                       preis:'35 €',    dauer:60 },
-  { id:15, name:'Glossing',                                     preis:'15 €',    dauer:20 },
-  { id:16, name:'Conditioner / Pflege',                         preis:'+5 €',    dauer:10 }
-];
-
-/* ====== Elemente & State ====== */
-const svcSel = document.getElementById('service');
-const svcInfo = document.getElementById('svcInfo');
-const resetBtn = document.getElementById('resetBtn');
-const dateEl = document.getElementById('date');
-const timeSec = document.getElementById('timeSec');
-const slotsEl = document.getElementById('slots');
-const dataSec = document.getElementById('dataSec');
-const nameEl = document.getElementById('name');
-const phoneEl = document.getElementById('phone');
-const noteEl = document.getElementById('note');
-const statusEl = document.getElementById('status');
-let selectedService=null, selectedDate=null, selectedTime=null;
-
-/* ====== Init Services ====== */
-svcSel.innerHTML = SERVICES.map(s =>
-  `<option value="${s.id}" data-dauer="${s.dauer}" data-name="${s.name}" data-preis="${s.preis}">
-    ${s.name} — ${s.preis}
-  </option>`
-).join('');
-updateSvcInfo();
-svcSel.addEventListener('change', updateSvcInfo);
-resetBtn.addEventListener('click', ()=>{
-  svcSel.selectedIndex=0; updateSvcInfo();
-  dateEl.value=''; timeSec.style.display='none'; dataSec.style.display='none';
-  slotsEl.innerHTML='<div class="muted">Bitte zuerst Datum wählen …</div>';
-  selectedDate=null; selectedTime=null; statusEl.textContent='';
-});
-function updateSvcInfo(){
-  const opt = svcSel.selectedOptions[0]; if(!opt) return;
-  svcInfo.textContent = `Dauer: ${opt.dataset.dauer} Min · Preis: ${opt.dataset.preis}`;
-  selectedService = { id: opt.value, name: opt.dataset.name, dauer: Number(opt.dataset.dauer) };
-}
-
-/* ====== Datum ====== */
-(function setMinDate(){
-  const now = new Date();
-  const y = now.getFullYear(), m = String(now.getMonth()+1).padStart(2,'0'), d = String(now.getDate()).padStart(2,'0');
-  dateEl.min = `${y}-${m}-${d}`;
-})();
-dateEl.addEventListener('change', ()=>{
-  selectedDate = dateEl.value; selectedTime = null;
-  if (!selectedDate || !selectedService){ timeSec.style.display='none'; return; }
-  const dt = new Date(selectedDate); const wd = dt.getDay(); // 0 So .. 6 Sa
-  if (![4,5,6].includes(wd)){
-    alert('Nur Donnerstag, Freitag oder Samstag buchbar.');
-    dateEl.value=''; timeSec.style.display='none'; return;
-  }
-  loadSlots();
-});
-
-/* ====== Slots laden ====== */
-async function loadSlots(){
-  timeSec.style.display='block'; dataSec.style.display='none';
-  slotsEl.innerHTML = '<div class="muted">Lade freie Zeiten …</div>';
-  try{
-    const url = `${API}?action=slots&date=${encodeURIComponent(selectedDate)}&duration=${encodeURIComponent(selectedService.dauer)}`;
-    const res = await fetch(url, { method:'GET' });
-    const data = await res.json();
-    const slots = Array.isArray(data.slots) ? data.slots : [];
-    if (!slots.length){ slotsEl.innerHTML = '<div class="muted">Keine freien Zeiten.</div>'; return; }
-    slotsEl.innerHTML = '';
-    for (const t of slots){
-      const b = document.createElement('button');
-      b.type='button'; b.className='slot'; b.textContent = t;
-      b.onclick = () => {
-        document.querySelectorAll('.slot').forEach(s=>s.classList.remove('selected'));
-        b.classList.add('selected'); selectedTime = t; dataSec.style.display='block';
-        statusEl.textContent=''; statusEl.className='status info';
-      };
-      slotsEl.appendChild(b);
+    function goToStep(n){
+      document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+      document.getElementById("step"+n).classList.add("active");
     }
-  }catch(e){
-    slotsEl.innerHTML = '<div class="err">Netzwerkfehler beim Laden der Slots</div>';
-  }
-}
 
-/* ====== Buchen (GET, CORS-freundlich) ====== */
-document.getElementById('bookBtn').addEventListener('click', async ()=>{
-  statusEl.className='status info';
-  if (!selectedService){ statusEl.textContent='Bitte Leistung wählen.'; return; }
-  if (!selectedDate){ statusEl.textContent='Bitte Datum wählen.'; return; }
-  if (!selectedTime){ statusEl.textContent='Bitte Uhrzeit wählen.'; return; }
-  const name = (nameEl.value||'').trim();
-  if (!name){ statusEl.textContent='Bitte Name eingeben.'; return; }
-
-  statusEl.textContent='Buchen …';
-  const params = new URLSearchParams({
-    action:'book',
-    serviceName: selectedService.name,
-    duration: String(selectedService.dauer),
-    date: selectedDate,
-    time: selectedTime,
-    name,
-    phone: (phoneEl.value||'').trim(),
-    note: (noteEl.value||'').trim()
-  });
-  const url = `${API}?${params.toString()}`;
-
-  try{
-    const res = await fetch(url, { method:'GET' });
-    const data = await res.json();
-    if (data.ok){
-      statusEl.textContent='✅ Termin gebucht!'; statusEl.className='status ok';
-      await loadSlots(); selectedTime=null;
-    } else {
-      statusEl.textContent='❌ '+(data.error||'Buchung fehlgeschlagen'); statusEl.className='status err';
+    // Schritt 1
+    function renderServices(){
+      const c=document.getElementById("services");
+      services.forEach(s=>{
+        const div=document.createElement("div");
+        div.className="service-card";
+        div.innerHTML=`<b>${s.name}</b><br>${s.preis} · ${s.dauer} Min`;
+        div.onclick=()=>{document.querySelectorAll(".service-card").forEach(x=>x.classList.remove("selected"));div.classList.add("selected");selService=s;document.getElementById("toStep2").disabled=false;};
+        c.appendChild(div);
+      });
     }
-  }catch(e){
-    statusEl.textContent='❌ Netzwerk-/Serverfehler'; statusEl.className='status err';
-  }
-});
-</script>
+
+    document.getElementById("toStep2").onclick=async()=>{
+      goToStep(2);
+      try{
+        const r=await fetch(SCRIPT_URL+"?action=getDates");
+        const d=await r.json();
+        renderDates(d.dates||generateDates());
+      }catch{renderDates(generateDates());}
+    };
+
+    function renderDates(dates){
+      const c=document.getElementById("dates");c.innerHTML="";
+      dates.forEach(date=>{
+        const d=new Date(date);
+        const wd=d.getDay(); // 0=So,1=Mo,...6=Sa
+        if([4,5,6].includes(wd)){
+          const b=document.createElement("button");
+          b.textContent=d.toLocaleDateString("de-DE",{weekday:"long",day:"2-digit",month:"2-digit"});
+          b.className="btn-secondary";
+          b.onclick=()=>{selDate=d;document.querySelectorAll("#dates button").forEach(x=>x.style.background="");b.style.background="var(--primary)";document.getElementById("toStep3").disabled=false;};
+          c.appendChild(b);
+        }
+      });
+    }
+
+    document.getElementById("toStep3").onclick=async()=>{
+      goToStep(3);
+      try{
+        const r=await fetch(SCRIPT_URL+"?action=getTimes&date="+selDate.toISOString().split("T")[0]);
+        const d=await r.json();renderTimes(d.times||generateTimes());
+      }catch{renderTimes(generateTimes());}
+    };
+
+    function renderTimes(times){
+      const c=document.getElementById("times");c.innerHTML="";
+      times.forEach(t=>{
+        const b=document.createElement("button");
+        b.textContent=t;b.className="btn-secondary";
+        b.onclick=()=>{selTime=t;document.querySelectorAll("#times button").forEach(x=>x.style.background="");b.style.background="var(--primary)";document.getElementById("toStep4").disabled=false;};
+        c.appendChild(b);
+      });
+    }
+
+    document.getElementById("toStep4").onclick=()=>goToStep(4);
+
+    async function book(){
+      const name=document.getElementById("name").value.trim();
+      const phone=document.getElementById("phone").value.trim();
+      if(!name){document.getElementById("nameErr").style.display="block";return;}
+      if(!phone){document.getElementById("phoneErr").style.display="block";return;}
+      const data={action:"bookAppointment",service:selService,date:selDate.toISOString().split("T")[0],time:selTime,name,phone,email:document.getElementById("email").value,notes:document.getElementById("notes").value};
+      try{
+        const r=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+        const res=await r.json();
+        if(res.success){goToStep(5);}else{alert("Fehler: "+res.message);}
+      }catch{alert("Netzwerkfehler. Bitte später erneut versuchen.");}
+    }
+
+    function generateDates(){const a=[];for(let i=1;i<=14;i++){const d=new Date();d.setDate(d.getDate()+i);a.push(d.toISOString().split("T")[0]);}return a;}
+    function generateTimes(){return ["12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30"];} // Fallback
+
+    renderServices();
+  </script>
 </body>
 </html>
-"""
-with open('/mnt/data/index.html', 'w', encoding='utf-8') as f:
-    f.write(html_content)
-print("Saved /mnt/data/index.html")
