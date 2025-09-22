@@ -1,84 +1,110 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Terminbuchung | Dein Friseursalon</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {--primary:#8b7355;--secondary:#d4af37;--light:#f8f5f0;--dark:#333;--gray:#e0e0e0;--success:#4caf50;--error:#f44336;}
-    body {margin:0;font-family:'Segoe UI',sans-serif;background:var(--light);color:var(--dark);}
-    header {background:linear-gradient(to right,var(--primary),var(--secondary));padding:1rem;color:white;text-align:center;}
-    .container {max-width:900px;margin:auto;padding:1rem;}
-    .step {display:none;}
-    .step.active {display:block;animation:fadeIn .3s;}
-    @keyframes fadeIn {from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-    .services-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;}
-    .service-card {border:1px solid var(--gray);padding:1rem;border-radius:8px;cursor:pointer;transition:.3s;}
-    .service-card:hover {border-color:var(--primary);transform:translateY(-3px);}
-    .service-card.selected {background:rgba(139,115,85,0.1);border-color:var(--primary);}
-    button {padding:.7rem 1.2rem;border:none;border-radius:6px;cursor:pointer;font-weight:600;}
-    .btn-primary {background:var(--primary);color:white;}
-    .btn-primary:disabled {background:var(--gray);cursor:not-allowed;}
-    .btn-secondary {background:var(--gray);}
-    .dates,.times {display:flex;flex-wrap:wrap;gap:.5rem;}
-    .dates button,.times button {flex:1 0 120px;}
-    label{display:block;margin:.5rem 0 .2rem;font-weight:600;}
-    input,textarea{width:100%;padding:.5rem;border:1px solid var(--gray);border-radius:5px;}
-    .error{color:var(--error);font-size:.9rem;display:none;}
-    .confirmation {text-align:center;padding:2rem;background:rgba(76,175,80,0.1);border-radius:10px;}
-    .confirmation i {font-size:3rem;color:var(--success);}
-    footer {background:var(--dark);color:white;text-align:center;padding:1rem;margin-top:2rem;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:var(--light);color:var(--dark);line-height:1.6}
+    header{background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff;padding:1.25rem;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+    h1{margin:0;font-weight:700}
+    .container{max-width:980px;margin:0 auto;padding:1.25rem}
+    .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem;margin:1rem 0}
+    .steps .dot{height:8px;border-radius:999px;background:var(--gray)}
+    .steps .dot.active{background:var(--primary)}
+    .card{background:#fff;border:1px solid var(--gray);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.06);padding:1.25rem}
+    .step{display:none;animation:fade .25s ease}
+    .step.active{display:block}
+    @keyframes fade{from{opacity:.6;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
+    .service-card{border:1px solid var(--gray);border-radius:10px;padding:1rem;cursor:pointer;transition:.2s;background:#fff}
+    .service-card:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(0,0,0,.06);border-color:var(--primary)}
+    .service-card.selected{border-color:var(--primary);background:rgba(139,115,85,.06)}
+    .muted{opacity:.8}
+    .row{display:flex;gap:.75rem;flex-wrap:wrap}
+    .row button{flex:1 0 120px}
+    button{padding:.75rem 1.1rem;border:none;border-radius:8px;font-weight:700;cursor:pointer;transition:.2s}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:disabled{background:#c7b8a6;cursor:not-allowed}
+    .btn-neutral{background:#eee}
+    .btn-neutral:hover{background:#e2e2e2}
+    label{display:block;margin:.5rem 0 .25rem;font-weight:600}
+    input,textarea{width:100%;padding:.7rem;border:1px solid var(--gray);border-radius:8px;background:#fff}
+    .error{color:var(--error);font-size:.9rem;display:none;margin-top:.25rem}
+    .confirmation{background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.35);border-radius:12px;padding:2rem;text-align:center}
+    .confirmation i{font-size:3rem;color:var(--success)}
+    footer{margin-top:2rem;color:#fff;background:#222;text-align:center;padding:1rem;border-top:3px solid var(--primary)}
   </style>
 </head>
 <body>
-  <header><h1>Termin online buchen</h1></header>
+  <header>
+    <h1><i class="fas fa-scissors"></i> Termin online buchen</h1>
+    <div class="muted">Donnerstag & Freitag: 12–18 Uhr · Samstag: 11–15 Uhr</div>
+  </header>
+
   <div class="container">
+    <div class="steps"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
 
-    <!-- Schritt 1 -->
-    <div id="step1" class="step active">
-      <h2>1. Service auswählen</h2>
+    <div class="card step active" id="step1">
+      <h2>1) Service auswählen</h2>
       <div class="services-grid" id="services"></div>
-      <button class="btn-primary" id="toStep2" disabled>Weiter</button>
+      <div style="margin-top:1rem;display:flex;gap:.75rem;justify-content:flex-end">
+        <button class="btn-primary" id="toStep2" disabled>Weiter</button>
+      </div>
     </div>
 
-    <!-- Schritt 2 -->
-    <div id="step2" class="step">
-      <h2>2. Datum auswählen</h2>
-      <div class="dates" id="dates"></div>
-      <button class="btn-secondary" onclick="goToStep(1)">Zurück</button>
-      <button class="btn-primary" id="toStep3" disabled>Weiter</button>
+    <div class="card step" id="step2">
+      <h2>2) Datum wählen <span class="muted">(nur Do–Fr–Sa in den nächsten 14 Tagen)</span></h2>
+      <div class="row" id="dates"></div>
+      <div style="margin-top:1rem;display:flex;gap:.75rem;justify-content:space-between">
+        <button class="btn-neutral" id="back1">Zurück</button>
+        <button class="btn-primary" id="toStep3" disabled>Weiter</button>
+      </div>
     </div>
 
-    <!-- Schritt 3 -->
-    <div id="step3" class="step">
-      <h2>3. Uhrzeit auswählen</h2>
-      <div class="times" id="times"></div>
-      <button class="btn-secondary" onclick="goToStep(2)">Zurück</button>
-      <button class="btn-primary" id="toStep4" disabled>Weiter</button>
+    <div class="card step" id="step3">
+      <h2>3) Uhrzeit wählen</h2>
+      <div class="row" id="times"></div>
+      <div style="margin-top:1rem;display:flex;gap:.75rem;justify-content:space-between">
+        <button class="btn-neutral" id="back2">Zurück</button>
+        <button class="btn-primary" id="toStep4" disabled>Weiter</button>
+      </div>
     </div>
 
-    <!-- Schritt 4 -->
-    <div id="step4" class="step">
-      <h2>4. Ihre Daten</h2>
-      <label for="name">Name *</label>
-      <input id="name"><div class="error" id="nameErr">Bitte Name eingeben</div>
+    <div class="card step" id="step4">
+      <h2>4) Ihre Daten</h2>
+      <label for="name">Vor- und Nachname *</label>
+      <input id="name" autocomplete="name" />
+      <div id="nameErr" class="error">Bitte Namen eingeben.</div>
+
       <label for="phone">Telefon *</label>
-      <input id="phone"><div class="error" id="phoneErr">Bitte Telefonnummer eingeben</div>
-      <label for="email">E-Mail</label><input id="email">
-      <label for="notes">Notizen</label><textarea id="notes"></textarea>
-      <button class="btn-secondary" onclick="goToStep(3)">Zurück</button>
-      <button class="btn-primary" onclick="book()">Termin buchen</button>
+      <input id="phone" autocomplete="tel" />
+      <div id="phoneErr" class="error">Bitte Telefonnummer eingeben.</div>
+
+      <label for="email">E-Mail</label>
+      <input id="email" autocomplete="email" />
+
+      <label for="notes">Notizen</label>
+      <textarea id="notes" rows="3" placeholder="Wünsche oder Hinweise…"></textarea>
+
+      <div style="margin-top:1rem;display:flex;gap:.75rem;justify-content:space-between">
+        <button class="btn-neutral" id="back3">Zurück</button>
+        <button class="btn-primary" id="bookBtn">Termin buchen</button>
+      </div>
     </div>
 
-    <!-- Schritt 5 -->
-    <div id="step5" class="step">
+    <div class="card step" id="step5">
       <div class="confirmation">
         <i class="fas fa-check-circle"></i>
         <h2>Termin erfolgreich gebucht!</h2>
-        <p>Wir freuen uns auf Ihren Besuch.</p>
+        <p>Vielen Dank – wir sehen uns zum ausgewählten Zeitpunkt.</p>
       </div>
-      <button class="btn-primary" onclick="goToStep(1)">Neuen Termin buchen</button>
+      <div style="margin-top:1rem;text-align:center">
+        <button class="btn-primary" id="newBooking">Neuen Termin buchen</button>
+      </div>
     </div>
   </div>
 
@@ -87,104 +113,180 @@
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw41Pmg5QqbE5H545jo4RbU-PZXcJTp2YTepbRajAIfN4i3fK7-oQ93g5OItROmo4JY/exec";
 
-    // Alle 16 Services
     const services = [
-      {id:1,name:"Maschinenhaarschnitt (Herren)",preis:"11 €",dauer:20},
-      {id:2,name:"Trockenschnitt (Herren)",preis:"15 €",dauer:25},
-      {id:3,name:"Waschen, Schneiden (Herren)",preis:"17 €",dauer:30},
-      {id:4,name:"Waschen, Schneiden, Föhnen (Herren)",preis:"19,50 €",dauer:35},
-      {id:5,name:"Trockenschnitt (Damen)",preis:"19 €",dauer:30},
-      {id:6,name:"Waschen, Schneiden (Damen)",preis:"21 €",dauer:35},
-      {id:7,name:"Waschen, Schneiden, Föhnen (kurz)",preis:"23 €",dauer:45},
-      {id:8,name:"Waschen, Schneiden, Föhnen (mittel)",preis:"28 €",dauer:60},
-      {id:9,name:"Waschen, Schneiden, Föhnen (lang)",preis:"33 €",dauer:90},
-      {id:10,name:"Ansatzfarbe",preis:"43 €",dauer:90},
-      {id:11,name:"Foliensträhnen XS (bis 15)",preis:"29 €",dauer:60},
-      {id:12,name:"Foliensträhnen S (halber Kopf)",preis:"49 €",dauer:90},
-      {id:13,name:"Foliensträhnen M (ganzer Kopf)",preis:"69 €",dauer:120},
-      {id:14,name:"Tönung",preis:"35 €",dauer:60},
-      {id:15,name:"Glossing",preis:"15 €",dauer:20},
-      {id:16,name:"Conditioner / Pflege",preis:"+5 €",dauer:10}
+      { id:1, name:"Maschinenhaarschnitt (Herren)", preis:"11 €", dauer:20 },
+      { id:2, name:"Trockenschnitt (Herren)", preis:"15 €", dauer:25 },
+      { id:3, name:"Waschen, Schneiden (Herren)", preis:"17 €", dauer:30 },
+      { id:4, name:"Waschen, Schneiden, Föhnen (Herren)", preis:"19,50 €", dauer:35 },
+      { id:5, name:"Trockenschnitt (Damen)", preis:"19 €", dauer:30 },
+      { id:6, name:"Waschen, Schneiden (Damen)", preis:"21 €", dauer:35 },
+      { id:7, name:"Waschen, Schneiden, Föhnen (kurz)", preis:"23 €", dauer:45 },
+      { id:8, name:"Waschen, Schneiden, Föhnen (mittel)", preis:"28 €", dauer:60 },
+      { id:9, name:"Waschen, Schneiden, Föhnen (lang)", preis:"33 €", dauer:90 },
+      { id:10, name:"Ansatzfarbe", preis:"43 €", dauer:90 },
+      { id:11, name:"Foliensträhnen XS (bis 15)", preis:"29 €", dauer:60 },
+      { id:12, name:"Foliensträhnen S (halber Kopf)", preis:"49 €", dauer:90 },
+      { id:13, name:"Foliensträhnen M (ganzer Kopf)", preis:"69 €", dauer:120 },
+      { id:14, name:"Tönung", preis:"35 €", dauer:60 },
+      { id:15, name:"Glossing", preis:"15 €", dauer:20 },
+      { id:16, name:"Conditioner / Pflege", preis:"+5 €", dauer:10 }
     ];
 
-    let selService=null, selDate=null, selTime=null;
+    let selService = null, selDate = null, selTime = null;
 
-    function goToStep(n){
+    const stepDots = () => document.querySelectorAll(".steps .dot");
+    function setStep(n) {
       document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
       document.getElementById("step"+n).classList.add("active");
+      stepDots().forEach((d,i)=>d.classList.toggle("active", i < n));
     }
 
-    // Schritt 1
     function renderServices(){
-      const c=document.getElementById("services");
+      const wrap = document.getElementById("services");
+      wrap.innerHTML = "";
       services.forEach(s=>{
-        const div=document.createElement("div");
-        div.className="service-card";
-        div.innerHTML=`<b>${s.name}</b><br>${s.preis} · ${s.dauer} Min`;
-        div.onclick=()=>{document.querySelectorAll(".service-card").forEach(x=>x.classList.remove("selected"));div.classList.add("selected");selService=s;document.getElementById("toStep2").disabled=false;};
-        c.appendChild(div);
+        const el = document.createElement("div");
+        el.className = "service-card";
+        el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
+            <div><div style="font-weight:700">${s.name}</div>
+            <div class="muted">Dauer: ${s.dauer} Min</div></div>
+            <div style="font-weight:800">${s.preis}</div>
+          </div>`;
+        el.onclick = ()=>{
+          document.querySelectorAll(".service-card").forEach(x=>x.classList.remove("selected"));
+          el.classList.add("selected");
+          selService = s;
+          document.getElementById("toStep2").disabled = false;
+        };
+        wrap.appendChild(el);
       });
     }
 
-    document.getElementById("toStep2").onclick=async()=>{
-      goToStep(2);
+    async function loadDates(){
       try{
-        const r=await fetch(SCRIPT_URL+"?action=getDates");
-        const d=await r.json();
-        renderDates(d.dates||generateDates());
-      }catch{renderDates(generateDates());}
-    };
-
+        const r = await fetch(SCRIPT_URL + "?action=getDates");
+        const d = await r.json();
+        renderDates(d.dates ?? generateClientDates());
+      }catch{
+        renderDates(generateClientDates());
+      }
+    }
     function renderDates(dates){
-      const c=document.getElementById("dates");c.innerHTML="";
-      dates.forEach(date=>{
-        const d=new Date(date);
-        const wd=d.getDay(); // 0=So,1=Mo,...6=Sa
+      const wrap = document.getElementById("dates");
+      wrap.innerHTML = "";
+      dates.forEach(ds=>{
+        const d = new Date(ds);
+        const wd = d.getDay();
         if([4,5,6].includes(wd)){
-          const b=document.createElement("button");
-          b.textContent=d.toLocaleDateString("de-DE",{weekday:"long",day:"2-digit",month:"2-digit"});
-          b.className="btn-secondary";
-          b.onclick=()=>{selDate=d;document.querySelectorAll("#dates button").forEach(x=>x.style.background="");b.style.background="var(--primary)";document.getElementById("toStep3").disabled=false;};
-          c.appendChild(b);
+          const b = document.createElement("button");
+          b.className = "btn-neutral";
+          b.textContent = d.toLocaleDateString("de-DE",{weekday:"long",day:"2-digit",month:"2-digit"});
+          b.onclick = ()=>{
+            selDate = d;
+            document.querySelectorAll("#dates button").forEach(x=>x.style.background="");
+            b.style.background = "var(--primary)"; b.style.color="#fff";
+            document.getElementById("toStep3").disabled = false;
+          };
+          wrap.appendChild(b);
         }
       });
     }
 
-    document.getElementById("toStep3").onclick=async()=>{
-      goToStep(3);
+    async function loadTimes(){
+      const dateStr = selDate.toISOString().split("T")[0];
       try{
-        const r=await fetch(SCRIPT_URL+"?action=getTimes&date="+selDate.toISOString().split("T")[0]);
-        const d=await r.json();renderTimes(d.times||generateTimes());
-      }catch{renderTimes(generateTimes());}
-    };
-
+        const r = await fetch(`${SCRIPT_URL}?action=getTimes&date=${encodeURIComponent(dateStr)}&serviceId=${selService.id}`);
+        const d = await r.json();
+        renderTimes((d && d.times) ? d.times : generateClientTimes(selDate, selService.dauer));
+      }catch{
+        renderTimes(generateClientTimes(selDate, selService.dauer));
+      }
+    }
     function renderTimes(times){
-      const c=document.getElementById("times");c.innerHTML="";
+      const wrap = document.getElementById("times");
+      wrap.innerHTML = "";
+      if(!times.length){
+        wrap.innerHTML = '<div class="muted">Für dieses Datum sind keine passenden Zeiten verfügbar.</div>';
+        document.getElementById("toStep4").disabled = true;
+        return;
+      }
       times.forEach(t=>{
-        const b=document.createElement("button");
-        b.textContent=t;b.className="btn-secondary";
-        b.onclick=()=>{selTime=t;document.querySelectorAll("#times button").forEach(x=>x.style.background="");b.style.background="var(--primary)";document.getElementById("toStep4").disabled=false;};
-        c.appendChild(b);
+        const b = document.createElement("button");
+        b.className = "btn-neutral";
+        b.textContent = t;
+        b.onclick = ()=>{
+          selTime = t;
+          document.querySelectorAll("#times button").forEach(x=>x.style.background="");
+          b.style.background = "var(--primary)"; b.style.color="#fff";
+          document.getElementById("toStep4").disabled = false;
+        };
+        wrap.appendChild(b);
       });
     }
 
-    document.getElementById("toStep4").onclick=()=>goToStep(4);
-
     async function book(){
-      const name=document.getElementById("name").value.trim();
-      const phone=document.getElementById("phone").value.trim();
-      if(!name){document.getElementById("nameErr").style.display="block";return;}
-      if(!phone){document.getElementById("phoneErr").style.display="block";return;}
-      const data={action:"bookAppointment",service:selService,date:selDate.toISOString().split("T")[0],time:selTime,name,phone,email:document.getElementById("email").value,notes:document.getElementById("notes").value};
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      document.getElementById("nameErr").style.display = name ? "none" : "block";
+      document.getElementById("phoneErr").style.display = phone ? "none" : "block";
+      if(!name || !phone) return;
+
+      const payload = {
+        action: "bookAppointment",
+        service: JSON.stringify(selService),
+        date: selDate.toISOString().split("T")[0],
+        time: selTime,
+        name, phone,
+        email: document.getElementById("email").value.trim(),
+        notes: document.getElementById("notes").value.trim()
+      };
+
+      const form = new URLSearchParams();
+      Object.entries(payload).forEach(([k,v])=>form.append(k, v));
+
       try{
-        const r=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
-        const res=await r.json();
-        if(res.success){goToStep(5);}else{alert("Fehler: "+res.message);}
-      }catch{alert("Netzwerkfehler. Bitte später erneut versuchen.");}
+        const r = await fetch(SCRIPT_URL,{ method:"POST", body: form });
+        const res = await r.json();
+        if(res && res.success){ setStep(5); }
+        else { alert("Fehler: " + (res && res.message ? res.message : "Unbekannter Fehler")); }
+      }catch{
+        alert("Netzwerkfehler – bitte später erneut versuchen.");
+      }
     }
 
-    function generateDates(){const a=[];for(let i=1;i<=14;i++){const d=new Date();d.setDate(d.getDate()+i);a.push(d.toISOString().split("T")[0]);}return a;}
-    function generateTimes(){return ["12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30"];} // Fallback
+    function generateClientDates(){
+      const out=[], today=new Date();
+      for(let i=1;i<=14;i++){ const d=new Date(today); d.setDate(today.getDate()+i); out.push(d.toISOString().split("T")[0]); }
+      return out;
+    }
+    function generateClientTimes(dateObj, durationMin){
+      const wd = dateObj.getDay();
+      let startHour=0, endHour=0;
+      if(wd===4 || wd===5){ startHour=12; endHour=18; }
+      else if(wd===6){ startHour=11; endHour=15; }
+      else { return []; }
+
+      const slots=[];
+      for(let h=startHour; h<endHour; h++){
+        for(let mm=0; mm<60; mm+=30){
+          const start = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), h, mm);
+          const end = new Date(start.getTime() + durationMin*60000);
+          if(end.getHours() < endHour || (end.getHours()===endHour && end.getMinutes()===0)){
+            slots.push(start.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}));
+          }
+        }
+      }
+      return slots;
+    }
+
+    document.getElementById("toStep2").onclick = ()=>{ setStep(2); loadDates(); };
+    document.getElementById("toStep3").onclick = ()=>{ setStep(3); loadTimes(); };
+    document.getElementById("toStep4").onclick = ()=> setStep(4);
+    document.getElementById("back1").onclick = ()=> setStep(1);
+    document.getElementById("back2").onclick = ()=> setStep(2);
+    document.getElementById("back3").onclick = ()=> setStep(3);
+    document.getElementById("bookBtn").onclick = book;
+    document.getElementById("newBooking").onclick = ()=>{ selService=selDate=selTime=null; document.getElementById("toStep2").disabled=true; setStep(1); };
 
     renderServices();
   </script>
