@@ -111,6 +111,7 @@
   <footer>&copy; 2025 Dein Friseursalon</footer>
 
   <script>
+    // <<< HIER DEINE /exec-URL einsetzen!
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw41Pmg5QqbE5H545jo4RbU-PZXcJTp2YTepbRajAIfN4i3fK7-oQ93g5OItROmo4JY/exec";
 
     const services = [
@@ -233,7 +234,7 @@
 
       const payload = {
         action: "bookAppointment",
-        service: JSON.stringify(selService),
+        service: JSON.stringify(selService),  // als String für Form-POST
         date: selDate.toISOString().split("T")[0],
         time: selTime,
         name, phone,
