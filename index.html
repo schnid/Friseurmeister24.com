@@ -1,297 +1,138 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Terminbuchung | Dein Friseursalon</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="utf-8">
+  <title>Friseurmeister24 – Online Termine buchen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Friseurmeister24 – Termin online buchen: Service & Mitarbeiter wählen, freien Slot anklicken, fertig. Schnell, mobilfreundlich und sicher.">
+  <meta name="theme-color" content="#0b1020">
+  <link rel="icon" href="app/favicon.png">
+  <!-- Open Graph -->
+  <meta property="og:title" content="Friseurmeister24 – Online Termine buchen">
+  <meta property="og:description" content="Schnell, mobilfreundlich & sicher. Jetzt Termin buchen.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://schnid.github.io/Friseurmeister24.com/">
+  <meta property="og:image" content="app/icons/Icon-512.png">
+  <!-- Strukturierte Daten -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"HairSalon",
+    "name":"Friseurmeister24",
+    "url":"https://schnid.github.io/Friseurmeister24.com/",
+    "image":"https://schnid.github.io/Friseurmeister24.com/app/icons/Icon-512.png",
+    "priceRange":"€€",
+    "openingHoursSpecification":[
+      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"18:00"},
+      {"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday"],"opens":"10:00","closes":"15:00"}
+    ],
+    "makesOffer":[
+      {"@type":"Offer","name":"Haarschnitt"},
+      {"@type":"Offer","name":"Waschen & Schneiden"},
+      {"@type":"Offer","name":"Färben"}
+    ]
+  }
+  </script>
   <style>
-    :root {--primary:#8b7355;--secondary:#d4af37;--light:#f8f5f0;--dark:#333;--gray:#e0e0e0;--success:#4caf50;--error:#f44336;}
-    *{box-sizing:border-box}
-    body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:var(--light);color:var(--dark);line-height:1.6}
-    header{background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff;padding:1.25rem;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.1)}
-    h1{margin:0;font-weight:700}
-    .container{max-width:980px;margin:0 auto;padding:1.25rem}
-    .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:.5rem;margin:1rem 0}
-    .steps .dot{height:8px;border-radius:999px;background:var(--gray)}
-    .steps .dot.active{background:var(--primary)}
-    .card{background:#fff;border:1px solid var(--gray);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.06);padding:1.25rem}
-    .step{display:none;animation:fade .25s ease}
-    .step.active{display:block}
-    @keyframes fade{from{opacity:.6;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    .services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
-    .service-card{border:1px solid var(--gray);border-radius:10px;padding:1rem;cursor:pointer;transition:.2s;background:#fff}
-    .service-card:hover{transform:translateY(-3px);box-shadow:0 10px 20px rgba(0,0,0,.06);border-color:var(--primary)}
-    .service-card.selected{border-color:var(--primary);background:rgba(139,115,85,.06)}
-    .muted{opacity:.8}
-    .row{display:flex;gap:.75rem;flex-wrap:wrap}
-    .row button{flex:1 0 120px}
-    button{padding:.75rem 1.1rem;border:none;border-radius:8px;font-weight:700;cursor:pointer;transition:.2s}
-    .btn-primary{background:var(--primary);color:#fff}
-    .btn-primary:disabled{background:#c7b8a6;cursor:not-allowed}
-    .btn-neutral{background:#eee}
-    .btn-neutral:hover{background:#e2e2e2}
-    label{display:block;margin:.5rem 0 .25rem;font-weight:600}
-    input,textarea{width:100%;padding:.7rem;border:1px solid var(--gray);border-radius:8px;background:#fff}
-    .error{color:var(--error);font-size:.9rem;display:none;margin-top:.25rem}
-    .confirmation{background:rgba(76,175,80,.1);border:1px solid rgba(76,175,80,.35);border-radius:12px;padding:2rem;text-align:center}
-    .confirmation i{font-size:3rem;color:var(--success)}
-    footer{margin-top:2rem;color:#fff;background:#222;text-align:center;padding:1rem;border-top:3px solid var(--primary)}
+    :root{--bg:#0b1020;--fg:#e8ebf1;--muted:#aab3c2;--line:#ffffff22;--acc:#4f8cff;--ok:#19c37d;--warn:#ffb020}
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:radial-gradient(1200px 600px at 80% -10%, #1a2a5a 0%, #0b1020 50%) no-repeat, var(--bg);color:var(--fg)}
+    a{color:inherit}
+    header{position:sticky;top:0;z-index:10;backdrop-filter:blur(6px);background:#0b1020c0;border-bottom:1px solid var(--line)}
+    .bar{max-width:1120px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:36px;height:36px;border-radius:10px;background:#4f8cff22;display:grid;place-items:center;border:1px solid var(--line)}
+    nav a{opacity:.9;text-decoration:none;margin:0 10px}
+    .wrap{max-width:1120px;margin:0 auto;padding:56px 16px}
+    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center}
+    .hero h1{font-size:clamp(28px,5vw,48px);line-height:1.05;margin:.2em 0}
+    .hero p{color:var(--muted);font-size:clamp(16px,2.4vw,18px)}
+    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+    .btn{appearance:none;border:none;border-radius:12px;padding:14px 18px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+    .btn.primary{background:var(--acc);color:white;box-shadow:0 10px 30px #4f8cff44}
+    .btn.ghost{background:#ffffff10;color:var(--fg);border:1px solid var(--line)}
+    .panel{background:#ffffff0a;border:1px solid var(--line);border-radius:16px;padding:16px}
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+    .list{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+    .kpi{display:flex;align-items:center;gap:10px}
+    .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#ffffff10;border:1px solid var(--line);font-size:12px}
+    section{scroll-margin-top:80px}
+    footer{border-top:1px solid var(--line);margin-top:48px}
+    .foot{max-width:1120px;margin:0 auto;padding:18px 16px;color:#9aa3b2;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    @media (max-width:900px){ .hero{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <header>
-    <h1><i class="fas fa-scissors"></i> Termin online buchen</h1>
-    <div class="muted">Donnerstag & Freitag: 12–18 Uhr · Samstag: 11–15 Uhr</div>
-  </header>
-
-  <div class="container">
-    <div class="steps"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-
-    <div class="card step active" id="step1">
-      <h2>1) Service auswählen</h2>
-      <div class="services-grid" id="services"></div>
-      <div style="margin-top:1rem;display:flex;gap:.75rem;justify-content:flex-end">
-        <button class="btn-primary" id="toStep2" disabled>Weiter</button>
-      </div>
+<header>
+  <div class="bar" role="navigation" aria-label="Hauptnavigation">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">✂️</div>
+      <strong>Friseurmeister24</strong>
     </div>
-
-    <div class="card step" id="step2">
-      <h2>2) Datum wählen <span class="muted">(nur Do–Fr–Sa in den nächsten 14 Tagen)</span></h2>
-      <div class="row" id="dates"></div>
-      <div style="margin-top:1rem;display:flex;gap:.75rem;justify-content:space-between">
-        <button class="btn-neutral" id="back1">Zurück</button>
-        <button class="btn-primary" id="toStep3" disabled>Weiter</button>
-      </div>
-    </div>
-
-    <div class="card step" id="step3">
-      <h2>3) Uhrzeit wählen</h2>
-      <div class="row" id="times"></div>
-      <div style="margin-top:1rem;display:flex;gap:.75rem;justify-content:space-between">
-        <button class="btn-neutral" id="back2">Zurück</button>
-        <button class="btn-primary" id="toStep4" disabled>Weiter</button>
-      </div>
-    </div>
-
-    <div class="card step" id="step4">
-      <h2>4) Ihre Daten</h2>
-      <label for="name">Vor- und Nachname *</label>
-      <input id="name" autocomplete="name" />
-      <div id="nameErr" class="error">Bitte Namen eingeben.</div>
-
-      <label for="phone">Telefon *</label>
-      <input id="phone" autocomplete="tel" />
-      <div id="phoneErr" class="error">Bitte Telefonnummer eingeben.</div>
-
-      <label for="email">E-Mail</label>
-      <input id="email" autocomplete="email" />
-
-      <label for="notes">Notizen</label>
-      <textarea id="notes" rows="3" placeholder="Wünsche oder Hinweise…"></textarea>
-
-      <div style="margin-top:1rem;display:flex;gap:.75rem;justify-content:space-between">
-        <button class="btn-neutral" id="back3">Zurück</button>
-        <button class="btn-primary" id="bookBtn">Termin buchen</button>
-      </div>
-    </div>
-
-    <div class="card step" id="step5">
-      <div class="confirmation">
-        <i class="fas fa-check-circle"></i>
-        <h2>Termin erfolgreich gebucht!</h2>
-        <p>Vielen Dank – wir sehen uns zum ausgewählten Zeitpunkt.</p>
-      </div>
-      <div style="margin-top:1rem;text-align:center">
-        <button class="btn-primary" id="newBooking">Neuen Termin buchen</button>
-      </div>
-    </div>
+    <nav>
+      <a href="#features">Funktionen</a>
+      <a href="#ablauf">So geht’s</a>
+      <a href="#preise">Preise</a>
+      <a href="#faq">FAQ</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
   </div>
+</header>
 
-  <footer>&copy; 2025 Dein Friseursalon</footer>
+<main>
+  <!-- HERO -->
+  <section class="wrap hero" id="home">
+    <div>
+      <span class="badge">Online buchen in 3 Schritten</span>
+      <h1>Termine schnell & einfach sichern</h1>
+      <p>Service & Mitarbeiter wählen, freien Slot anklicken, Name eingeben – fertig. Mobilfreundlich, ohne Wartezeiten am Telefon.</p>
+      <div class="cta">
+        <a class="btn primary" id="ctaApp" href="./app/">🚀 Jetzt Termin buchen</a>
+        <a class="btn ghost" href="#features">Mehr erfahren</a>
+      </div>
+      <div class="kpi" style="margin-top:14px">
+        <span class="badge">SSL</span>
+        <span class="badge">Keine Registrierung für Kunden</span>
+        <span class="badge">Admin: Verschieben möglich</span>
+      </div>
+    </div>
+    <div class="panel" aria-label="App-Vorschau">
+      <div style="aspect-ratio:16/10; background:#0e1736; border:1px solid var(--line); border-radius:12px; display:grid; place-items:center; color:#a2b2d9;">
+        Vorschau – App läuft unter <code>/app/</code>
+      </div>
+      <ul class="list" style="margin-top:12px">
+        <li>• Services mit Dauer & Puffer</li>
+        <li>• Mitarbeiter mit Qualifikationen</li>
+        <li>• Kollisionen werden beim Buchen verhindert</li>
+      </ul>
+    </div>
+  </section>
 
-  <script>
-    // ***** HIER DEINE /exec-URL EINTRAGEN *****
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwJW_Z8ptTcjg69H1P0Y0R7RWG2Hx29mHqfIGHIn63enSddNUhroyrJrhD_WCGHgxqE/exec
-    // Services
-    const services = [
-      { id:1, name:"Maschinenhaarschnitt (Herren)", preis:"11 €", dauer:20 },
-      { id:2, name:"Trockenschnitt (Herren)", preis:"15 €", dauer:25 },
-      { id:3, name:"Waschen, Schneiden (Herren)", preis:"17 €", dauer:30 },
-      { id:4, name:"Waschen, Schneiden, Föhnen (Herren)", preis:"19,50 €", dauer:35 },
-      { id:5, name:"Trockenschnitt (Damen)", preis:"19 €", dauer:30 },
-      { id:6, name:"Waschen, Schneiden (Damen)", preis:"21 €", dauer:35 },
-      { id:7, name:"Waschen, Schneiden, Föhnen (kurz)", preis:"23 €", dauer:45 },
-      { id:8, name:"Waschen, Schneiden, Föhnen (mittel)", preis:"28 €", dauer:60 },
-      { id:9, name:"Waschen, Schneiden, Föhnen (lang)", preis:"33 €", dauer:90 },
-      { id:10, name:"Ansatzfarbe", preis:"43 €", dauer:90 },
-      { id:11, name:"Foliensträhnen XS (bis 15)", preis:"29 €", dauer:60 },
-      { id:12, name:"Foliensträhnen S (halber Kopf)", preis:"49 €", dauer:90 },
-      { id:13, name:"Foliensträhnen M (ganzer Kopf)", preis:"69 €", dauer:120 },
-      { id:14, name:"Tönung", preis:"35 €", dauer:60 },
-      { id:15, name:"Glossing", preis:"15 €", dauer:20 },
-      { id:16, name:"Conditioner / Pflege", preis:"+5 €", dauer:10 }
-    ];
+  <!-- FEATURES -->
+  <section class="wrap" id="features" aria-labelledby="h-features">
+    <h2 id="h-features">Funktionen</h2>
+    <div class="grid3">
+      <div class="panel"><h3>📅 Live-Slots</h3><p>Freie Zeiten im 15-Minuten-Raster, gefiltert nach Service & Mitarbeiter.</p></div>
+      <div class="panel"><h3>🧑‍💼 Admin-Board</h3><p>Termine ansehen & mit Zeitwahl **verschieben**. Rechte per Supabase-Rollen abgesichert.</p></div>
+      <div class="panel"><h3>📱 Mobilfreundlich</h3><p>Optimiert für Handy & Tablet. Keine Installation nötig – läuft im Browser.</p></div>
+    </div>
+  </section>
 
-    let selService = null, selDate = null, selTime = null;
+  <!-- ABLAUF -->
+  <section class="wrap" id="ablauf" aria-labelledby="h-ablauf">
+    <h2 id="h-ablauf">So funktioniert’s</h2>
+    <div class="grid3">
+      <div class="panel"><h3>1) Wählen</h3><p>Service & Mitarbeiter wählen. System prüft Qualifikationen.</p></div>
+      <div class="panel"><h3>2) Slot</h3><p>Datum wählen, freien Slot antippen, Name/Telefon eingeben.</p></div>
+      <div class="panel"><h3>3) Bestätigung</h3><p>Termin wird gespeichert und erscheint im Admin-Board.</p></div>
+    </div>
+    <div class="cta" style="margin-top:16px">
+      <a class="btn primary" id="ctaApp2" href="./app/">🚀 Termin buchen</a>
+      <a class="btn ghost" href="./app/#/admin">🔐 Admin</a>
+    </div>
+  </section>
 
-    const stepDots = () => document.querySelectorAll(".steps .dot");
-    function setStep(n) {
-      document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
-      document.getElementById("step"+n).classList.add("active");
-      stepDots().forEach((d,i)=>d.classList.toggle("active", i < n));
-    }
-
-    function renderServices(){
-      const wrap = document.getElementById("services");
-      wrap.innerHTML = "";
-      services.forEach(s=>{
-        const el = document.createElement("div");
-        el.className = "service-card";
-        el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
-            <div><div style="font-weight:700">${s.name}</div>
-            <div class="muted">Dauer: ${s.dauer} Min</div></div>
-            <div style="font-weight:800">${s.preis}</div>
-          </div>`;
-        el.onclick = ()=>{
-          document.querySelectorAll(".service-card").forEach(x=>x.classList.remove("selected"));
-          el.classList.add("selected");
-          selService = s;
-          document.getElementById("toStep2").disabled = false;
-        };
-        wrap.appendChild(el);
-      });
-    }
-
-    async function loadDates(){
-      try{
-        const r = await fetch(SCRIPT_URL + "?action=getDates");
-        const d = await r.json();
-        renderDates(d.dates ?? generateClientDates());
-      }catch{
-        renderDates(generateClientDates());
-      }
-    }
-    function renderDates(dates){
-      const wrap = document.getElementById("dates");
-      wrap.innerHTML = "";
-      dates.forEach(ds=>{
-        const d = new Date(ds);
-        const wd = d.getDay();
-        if([4,5,6].includes(wd)){
-          const b = document.createElement("button");
-          b.className = "btn-neutral";
-          b.textContent = d.toLocaleDateString("de-DE",{weekday:"long",day:"2-digit",month:"2-digit"});
-          b.onclick = ()=>{
-            selDate = d;
-            document.querySelectorAll("#dates button").forEach(x=>x.style.background="");
-            b.style.background = "var(--primary)"; b.style.color="#fff";
-            document.getElementById("toStep3").disabled = false;
-          };
-          wrap.appendChild(b);
-        }
-      });
-    }
-
-    async function loadTimes(){
-      const dateStr = selDate.toISOString().split("T")[0];
-      try{
-        const r = await fetch(`${SCRIPT_URL}?action=getTimes&date=${encodeURIComponent(dateStr)}&serviceId=${selService.id}`);
-        const d = await r.json();
-        renderTimes((d && d.times) ? d.times : generateClientTimes(selDate, selService.dauer));
-      }catch{
-        renderTimes(generateClientTimes(selDate, selService.dauer));
-      }
-    }
-    function renderTimes(times){
-      const wrap = document.getElementById("times");
-      wrap.innerHTML = "";
-      if(!times.length){
-        wrap.innerHTML = '<div class="muted">Für dieses Datum sind keine passenden Zeiten verfügbar.</div>';
-        document.getElementById("toStep4").disabled = true;
-        return;
-      }
-      times.forEach(t=>{
-        const b = document.createElement("button");
-        b.className = "btn-neutral";
-        b.textContent = t;
-        b.onclick = ()=>{
-          selTime = t;
-          document.querySelectorAll("#times button").forEach(x=>x.style.background="");
-          b.style.background = "var(--primary)"; b.style.color="#fff";
-          document.getElementById("toStep4").disabled = false;
-        };
-        wrap.appendChild(b);
-      });
-    }
-
-    async function book(){
-      const name = document.getElementById("name").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      document.getElementById("nameErr").style.display = name ? "none" : "block";
-      document.getElementById("phoneErr").style.display = phone ? "none" : "block";
-      if(!name || !phone) return;
-
-      // Sende JSON – dein Backend akzeptiert JSON **und** Form-POST
-      const payload = {
-        action: "bookAppointment",
-        service: selService,
-        date: selDate.toISOString().split("T")[0],
-        time: selTime,
-        name, phone,
-        email: document.getElementById("email").value.trim(),
-        notes: document.getElementById("notes").value.trim()
-      };
-
-      try{
-        const r = await fetch(SCRIPT_URL,{
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body: JSON.stringify(payload)
-        });
-        const res = await r.json();
-        if(res && res.success){ setStep(5); }
-        else { alert("Fehler: " + (res && res.message ? res.message : "Unbekannter Fehler")); }
-      }catch{
-        alert("Netzwerkfehler – bitte später erneut versuchen.");
-      }
-    }
-
-    function generateClientDates(){
-      const out=[], today=new Date();
-      for(let i=1;i<=14;i++){ const d=new Date(today); d.setDate(today.getDate()+i); out.push(d.toISOString().split("T")[0]); }
-      return out;
-    }
-    function generateClientTimes(dateObj, durationMin){
-      const wd = dateObj.getDay();
-      let startHour=0, endHour=0;
-      if(wd===4 || wd===5){ startHour=12; endHour=18; }
-      else if(wd===6){ startHour=11; endHour=15; }
-      else { return []; }
-
-      const slots=[];
-      for(let h=startHour; h<endHour; h++){
-        for(let mm=0; mm<60; mm+=30){
-          const start = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate(), h, mm);
-          const end = new Date(start.getTime() + durationMin*60000);
-          if(end.getHours() < endHour || (end.getHours()===endHour && end.getMinutes()===0)){
-            slots.push(start.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}));
-          }
-        }
-      }
-      return slots;
-    }
-
-    document.getElementById("toStep2").onclick = ()=>{ setStep(2); loadDates(); };
-    document.getElementById("toStep3").onclick = ()=>{ setStep(3); loadTimes(); };
-    document.getElementById("toStep4").onclick = ()=> setStep(4);
-    document.getElementById("back1").onclick = ()=> setStep(1);
-    document.getElementById("back2").onclick = ()=> setStep(2);
-    document.getElementById("back3").onclick = ()=> setStep(3);
-    document.getElementById("bookBtn").onclick = book;
-    document.getElementById("newBooking").onclick = ()=>{ selService=selDate=selTime=null; document.getElementById("toStep2").disabled=true; setStep(1); };
-
-    renderServices();
-  </script>
-</body>
-</html>
+  <!-- PREISE / LEISTUNGEN (optional, statisch – kann später aus DB kommen) -->
+  <section class="wrap" id="preise" aria-labelledby="h-preise">
+    <h2 id="h-preise">Leistunge
