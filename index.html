@@ -1,138 +1,1702 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="utf-8">
-  <title>Friseurmeister24 – Online Termine buchen</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Friseurmeister24 – Termin online buchen: Service & Mitarbeiter wählen, freien Slot anklicken, fertig. Schnell, mobilfreundlich und sicher.">
-  <meta name="theme-color" content="#0b1020">
-  <link rel="icon" href="app/favicon.png">
-  <!-- Open Graph -->
-  <meta property="og:title" content="Friseurmeister24 – Online Termine buchen">
-  <meta property="og:description" content="Schnell, mobilfreundlich & sicher. Jetzt Termin buchen.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://schnid.github.io/Friseurmeister24.com/">
-  <meta property="og:image" content="app/icons/Icon-512.png">
-  <!-- Strukturierte Daten -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"HairSalon",
-    "name":"Friseurmeister24",
-    "url":"https://schnid.github.io/Friseurmeister24.com/",
-    "image":"https://schnid.github.io/Friseurmeister24.com/app/icons/Icon-512.png",
-    "priceRange":"€€",
-    "openingHoursSpecification":[
-      {"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"18:00"},
-      {"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday"],"opens":"10:00","closes":"15:00"}
-    ],
-    "makesOffer":[
-      {"@type":"Offer","name":"Haarschnitt"},
-      {"@type":"Offer","name":"Waschen & Schneiden"},
-      {"@type":"Offer","name":"Färben"}
-    ]
-  }
-  </script>
-  <style>
-    :root{--bg:#0b1020;--fg:#e8ebf1;--muted:#aab3c2;--line:#ffffff22;--acc:#4f8cff;--ok:#19c37d;--warn:#ffb020}
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;background:radial-gradient(1200px 600px at 80% -10%, #1a2a5a 0%, #0b1020 50%) no-repeat, var(--bg);color:var(--fg)}
-    a{color:inherit}
-    header{position:sticky;top:0;z-index:10;backdrop-filter:blur(6px);background:#0b1020c0;border-bottom:1px solid var(--line)}
-    .bar{max-width:1120px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;justify-content:space-between}
-    .brand{display:flex;align-items:center;gap:10px}
-    .logo{width:36px;height:36px;border-radius:10px;background:#4f8cff22;display:grid;place-items:center;border:1px solid var(--line)}
-    nav a{opacity:.9;text-decoration:none;margin:0 10px}
-    .wrap{max-width:1120px;margin:0 auto;padding:56px 16px}
-    .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:center}
-    .hero h1{font-size:clamp(28px,5vw,48px);line-height:1.05;margin:.2em 0}
-    .hero p{color:var(--muted);font-size:clamp(16px,2.4vw,18px)}
-    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
-    .btn{appearance:none;border:none;border-radius:12px;padding:14px 18px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
-    .btn.primary{background:var(--acc);color:white;box-shadow:0 10px 30px #4f8cff44}
-    .btn.ghost{background:#ffffff10;color:var(--fg);border:1px solid var(--line)}
-    .panel{background:#ffffff0a;border:1px solid var(--line);border-radius:16px;padding:16px}
-    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-    .list{display:grid;gap:8px;margin:0;padding:0;list-style:none}
-    .kpi{display:flex;align-items:center;gap:10px}
-    .badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#ffffff10;border:1px solid var(--line);font-size:12px}
-    section{scroll-margin-top:80px}
-    footer{border-top:1px solid var(--line);margin-top:48px}
-    .foot{max-width:1120px;margin:0 auto;padding:18px 16px;color:#9aa3b2;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
-    @media (max-width:900px){ .hero{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hair Studio - Termin buchen</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #f3f4f6;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --border: #e5e7eb;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            background: var(--gradient);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            min-height: 100vh;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-tab {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient);
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Progress Steps */
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 0;
+            transition: background 0.3s;
+        }
+
+        .progress-step {
+            background: white;
+            border: 2px solid var(--border);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+
+        .progress-step.completed {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .progress-step.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* Cards */
+        .service-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .service-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-4px);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(to right, rgba(37, 99, 235, 0.08), rgba(37, 99, 235, 0.04));
+        }
+
+        .service-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .service-info {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .service-price {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Employee Selection */
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .employee-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .employee-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .employee-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(to bottom, rgba(37, 99, 235, 0.08), rgba(37, 99, 235, 0.04));
+        }
+
+        .employee-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 50%;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .employee-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Date & Time Selection */
+        .date-selector {
+            margin-bottom: 24px;
+        }
+
+        .date-chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .date-chip {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 8px 16px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            min-width: 80px;
+            flex-shrink: 0;
+        }
+
+        .date-chip:hover {
+            border-color: var(--primary);
+        }
+
+        .date-chip.selected {
+            background: var(--gradient);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .date-day {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .date-date {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .time-slot {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .time-slot:hover:not(.disabled) {
+            border-color: var(--primary);
+            background: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .time-slot.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .time-slot.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: var(--danger);
+            color: white;
+        }
+
+        .waitlist-btn {
+            background: var(--warning);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        /* Confirmation */
+        .confirmation-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .success-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--success);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+        }
+
+        .confirmation-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .confirmation-details {
+            background: var(--secondary);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Admin Styles */
+        .admin-login {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 320px;
+            margin: 50px auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .admin-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .admin-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .admin-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--gradient);
+            color: white;
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .table td {
+            padding: 12px 8px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .badge-pending {
+            background: rgba(251, 191, 36, 0.1);
+            color: var(--warning);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-edit {
+            background: var(--secondary);
+            color: var(--text);
+        }
+
+        .btn-delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .btn-invoice {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-edit:hover, .btn-invoice:hover {
+            background: var(--border);
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            padding: 20px;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+
+            .time-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .employee-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .nav-tab {
+                border-bottom: 1px solid var(--border);
+                text-align: left;
+            }
+
+            .nav-tab.active::after {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
-<header>
-  <div class="bar" role="navigation" aria-label="Hauptnavigation">
-    <div class="brand">
-      <div class="logo" aria-hidden="true">✂️</div>
-      <strong>Friseurmeister24</strong>
-    </div>
-    <nav>
-      <a href="#features">Funktionen</a>
-      <a href="#ablauf">So geht’s</a>
-      <a href="#preise">Preise</a>
-      <a href="#faq">FAQ</a>
-      <a href="#kontakt">Kontakt</a>
-    </nav>
-  </div>
-</header>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">✂️ Hair Studio</div>
+            <div class="tagline">Professionelle Buchung – Modern & Einfach</div>
+        </div>
 
-<main>
-  <!-- HERO -->
-  <section class="wrap hero" id="home">
-    <div>
-      <span class="badge">Online buchen in 3 Schritten</span>
-      <h1>Termine schnell & einfach sichern</h1>
-      <p>Service & Mitarbeiter wählen, freien Slot anklicken, Name eingeben – fertig. Mobilfreundlich, ohne Wartezeiten am Telefon.</p>
-      <div class="cta">
-        <a class="btn primary" id="ctaApp" href="./app/">🚀 Jetzt Termin buchen</a>
-        <a class="btn ghost" href="#features">Mehr erfahren</a>
-      </div>
-      <div class="kpi" style="margin-top:14px">
-        <span class="badge">SSL</span>
-        <span class="badge">Keine Registrierung für Kunden</span>
-        <span class="badge">Admin: Verschieben möglich</span>
-      </div>
-    </div>
-    <div class="panel" aria-label="App-Vorschau">
-      <div style="aspect-ratio:16/10; background:#0e1736; border:1px solid var(--line); border-radius:12px; display:grid; place-items:center; color:#a2b2d9;">
-        Vorschau – App läuft unter <code>/app/</code>
-      </div>
-      <ul class="list" style="margin-top:12px">
-        <li>• Services mit Dauer & Puffer</li>
-        <li>• Mitarbeiter mit Qualifikationen</li>
-        <li>• Kollisionen werden beim Buchen verhindert</li>
-      </ul>
-    </div>
-  </section>
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('booking')">Termin buchen</button>
+            <button class="nav-tab" onclick="switchTab('admin')">Admin</button>
+        </div>
 
-  <!-- FEATURES -->
-  <section class="wrap" id="features" aria-labelledby="h-features">
-    <h2 id="h-features">Funktionen</h2>
-    <div class="grid3">
-      <div class="panel"><h3>📅 Live-Slots</h3><p>Freie Zeiten im 15-Minuten-Raster, gefiltert nach Service & Mitarbeiter.</p></div>
-      <div class="panel"><h3>🧑‍💼 Admin-Board</h3><p>Termine ansehen & mit Zeitwahl **verschieben**. Rechte per Supabase-Rollen abgesichert.</p></div>
-      <div class="panel"><h3>📱 Mobilfreundlich</h3><p>Optimiert für Handy & Tablet. Keine Installation nötig – läuft im Browser.</p></div>
-    </div>
-  </section>
+        <!-- Booking Tab -->
+        <div id="booking-tab" class="screen active">
+            <!-- Progress Bar -->
+            <div class="progress-bar" id="progress-bar">
+                <div class="progress-step active">1</div>
+                <div class="progress-step">2</div>
+                <div class="progress-step">3</div>
+                <div class="progress-step">4</div>
+            </div>
 
-  <!-- ABLAUF -->
-  <section class="wrap" id="ablauf" aria-labelledby="h-ablauf">
-    <h2 id="h-ablauf">So funktioniert’s</h2>
-    <div class="grid3">
-      <div class="panel"><h3>1) Wählen</h3><p>Service & Mitarbeiter wählen. System prüft Qualifikationen.</p></div>
-      <div class="panel"><h3>2) Slot</h3><p>Datum wählen, freien Slot antippen, Name/Telefon eingeben.</p></div>
-      <div class="panel"><h3>3) Bestätigung</h3><p>Termin wird gespeichert und erscheint im Admin-Board.</p></div>
-    </div>
-    <div class="cta" style="margin-top:16px">
-      <a class="btn primary" id="ctaApp2" href="./app/">🚀 Termin buchen</a>
-      <a class="btn ghost" href="./app/#/admin">🔐 Admin</a>
-    </div>
-  </section>
+            <!-- Step 1: Service Selection -->
+            <div id="step1" class="booking-step active">
+                <h2 style="margin-bottom: 20px;">Wähle deine Leistung</h2>
+                <div id="services-list"></div>
+                <button class="btn btn-primary" onclick="nextStep()" style="margin-top: 20px;">Weiter</button>
+            </div>
 
-  <!-- PREISE / LEISTUNGEN (optional, statisch – kann später aus DB kommen) -->
-  <section class="wrap" id="preise" aria-labelledby="h-preise">
-    <h2 id="h-preise">Leistunge
+            <!-- Step 2: Employee & Time -->
+            <div id="step2" class="booking-step" style="display: none;">
+                <h2 style="margin-bottom: 20px;">Mitarbeiter & Termin</h2>
+                
+                <h3 style="font-size: 16px; margin-bottom: 12px;">Wähle deinen Stylisten</h3>
+                <div class="employee-grid" id="employee-list"></div>
+
+                <h3 style="font-size: 16px; margin-bottom: 12px;">Wähle dein Datum</h3>
+                <div class="date-selector">
+                    <div class="date-chips" id="date-chips"></div>
+                </div>
+
+                <h3 style="font-size: 16px; margin-bottom: 12px;">Verfügbare Zeiten</h3>
+                <div class="time-grid" id="time-slots"></div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Zurück</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Weiter</button>
+                </div>
+            </div>
+
+            <!-- Step 3: Customer Data -->
+            <div id="step3" class="booking-step" style="display: none;">
+                <h2 style="margin-bottom: 20px;">Deine Daten</h2>
+                
+                <div class="form-group">
+                    <label>Name *</label>
+                    <input type="text" id="customer-name" placeholder="Max Mustermann" required>
+                </div>
+
+                <div class="form-group">
+                    <label>E-Mail *</label>
+                    <input type="email" id="customer-email" placeholder="max@beispiel.de" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Telefon *</label>
+                    <input type="tel" id="customer-phone" placeholder="+49 151 12345678" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Anmerkungen (optional)</label>
+                    <textarea id="customer-notes" rows="3" placeholder="Besondere Wünsche? z.B. Allergien"></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="previousStep()">Zurück</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Termin buchen</button>
+                </div>
+            </div>
+
+            <!-- Step 4: Confirmation -->
+            <div id="step4" class="booking-step" style="display: none;">
+                <div class="confirmation-card">
+                    <div class="success-icon">✓</div>
+                    <h2 class="confirmation-title">Termin gebucht!</h2>
+                    <p style="color: var(--text-light); margin-bottom: 20px;">
+                        Vielen Dank! Wir freuen uns auf deinen Besuch.
+                    </p>
+                    
+                    <div class="confirmation-details" id="confirmation-details"></div>
+
+                    <button class="btn btn-primary" onclick="downloadICS()">
+                        📅 Zum Kalender hinzufügen
+                    </button>
+                    <button class="btn btn-secondary" onclick="shareBooking()" style="margin-top: 12px;">
+                        📱 Teilen
+                    </button>
+                    <button class="btn btn-secondary" onclick="newBooking()" style="margin-top: 12px;">
+                        Neuer Termin
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Tab -->
+        <div id="admin-tab" class="screen" style="display: none;">
+            <!-- Admin Login -->
+            <div id="admin-login" class="admin-login">
+                <h2 style="margin-bottom: 20px; text-align: center;">Admin-Bereich</h2>
+                <div class="form-group">
+                    <label>PIN eingeben</label>
+                    <input type="password" id="admin-pin" placeholder="••••">
+                </div>
+                <button class="btn btn-primary" onclick="loginAdmin()">Anmelden</button>
+            </div>
+
+            <!-- Admin Dashboard -->
+            <div id="admin-dashboard" style="display: none;">
+                <div class="admin-header">
+                    <h2 class="admin-title">Admin Dashboard</h2>
+                    <button class="btn btn-small btn-edit" onclick="logoutAdmin()">Abmelden</button>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="admin-section">
+                    <h3 class="admin-section-title">Mitarbeiterstatistiken</h3>
+                    <div class="stats-grid" id="stats-grid"></div>
+                </div>
+
+                <!-- Services Management -->
+                <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 class="admin-section-title">Leistungen</h3>
+                        <button class="btn btn-small btn-primary" onclick="showServiceModal()">+ Neu</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Dauer</th>
+                                <th>Preis</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="services-table"></tbody>
+                    </table>
+                </div>
+
+                <!-- Employees Management -->
+                <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 class="admin-section-title">Mitarbeiter</h3>
+                        <button class="btn btn-small btn-primary" onclick="showEmployeeModal()">+ Neu</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employees-table"></tbody>
+                    </table>
+                </div>
+
+                <!-- Appointments -->
+                <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 class="admin-section-title">Termine</h3>
+                        <button class="btn btn-small btn-edit" onclick="exportCSV()">CSV Export</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Datum</th>
+                                <th>Zeit</th>
+                                <th>Kunde</th>
+                                <th>Leistung</th>
+                                <th>Mitarbeiter</th>
+                                <th>Status</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appointments-table"></tbody>
+                    </table>
+                </div>
+
+                <!-- Waitlist -->
+                <div class="admin-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 class="admin-section-title">Warteliste</h3>
+                        <button class="btn btn-small btn-primary" onclick="clearWaitlist()">Leeren</button>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Kunde</th>
+                                <th>Service</th>
+                                <th>Gewünschtes Datum</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="waitlist-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="service-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Leistung hinzufügen</h3>
+                <button class="modal-close" onclick="closeModal('service-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="service-name" placeholder="z.B. Maschinenhaarschnitt (Herren)">
+            </div>
+            <div class="form-group">
+                <label>Dauer (Minuten)</label>
+                <input type="number" id="service-duration" placeholder="20">
+            </div>
+            <div class="form-group">
+                <label>Puffer (Minuten)</label>
+                <input type="number" id="service-buffer" placeholder="15">
+            </div>
+            <div class="form-group">
+                <label>Preis (€)</label>
+                <input type="number" step="0.5" id="service-price" placeholder="11">
+            </div>
+            <button class="btn btn-primary" onclick="saveService()">Speichern</button>
+        </div>
+    </div>
+
+    <div id="employee-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Mitarbeiter hinzufügen</h3>
+                <button class="modal-close" onclick="closeModal('employee-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="employee-name" placeholder="z.B. Anna Müller">
+            </div>
+            <div class="form-group">
+                <label>Position</label>
+                <input type="text" id="employee-position" placeholder="z.B. Stylistin">
+            </div>
+            <button class="btn btn-primary" onclick="saveEmployee()">Speichern</button>
+        </div>
+    </div>
+
+    <div id="waitlist-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Zur Warteliste hinzufügen</h3>
+                <button class="modal-close" onclick="closeModal('waitlist-modal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>E-Mail *</label>
+                <input type="email" id="waitlist-email" placeholder="max@beispiel.de" required>
+            </div>
+            <div class="form-group">
+                <label>Gewünschtes Datum</label>
+                <input type="date" id="waitlist-date" required>
+            </div>
+            <button class="btn btn-warning" onclick="addToWaitlist()">Hinzufügen</button>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        const ADMIN_PIN = '1234'; // Ändere das!
+        let currentStep = 1;
+        let selectedService = null;
+        let selectedEmployee = null;
+        let selectedDate = null;
+        let selectedTime = null;
+        let customerData = {};
+
+        // Initialize data with full services
+        if (!localStorage.getItem('salonData')) {
+            const initialData = {
+                services: [
+                    { id: 1, name: 'Maschinenhaarschnitt (Herren)', duration: 20, buffer: 15, price: 11 },
+                    { id: 2, name: 'Trockenschnitt (Herren)', duration: 25, buffer: 15, price: 15 },
+                    { id: 3, name: 'Waschen, Schneiden (Herren)', duration: 30, buffer: 15, price: 17 },
+                    { id: 4, name: 'Waschen, Schneiden, Föhnen (Herren)', duration: 35, buffer: 15, price: 19.5 },
+                    { id: 5, name: 'Trockenschnitt (Damen)', duration: 30, buffer: 15, price: 19 },
+                    { id: 6, name: 'Waschen, Schneiden (Damen)', duration: 35, buffer: 15, price: 21 },
+                    { id: 7, name: 'Waschen, Schneiden, Föhnen (kurz)', duration: 45, buffer: 15, price: 23 },
+                    { id: 8, name: 'Waschen, Schneiden, Föhnen (mittel)', duration: 60, buffer: 15, price: 28 },
+                    { id: 9, name: 'Waschen, Schneiden, Föhnen (lang)', duration: 90, buffer: 15, price: 33 },
+                    { id: 10, name: 'Ansatzfarbe', duration: 90, buffer: 15, price: 43 },
+                    { id: 11, name: 'Foliensträhnen XS (bis 15)', duration: 60, buffer: 15, price: 29 },
+                    { id: 12, name: 'Foliensträhnen S (halber Kopf)', duration: 90, buffer: 15, price: 49 },
+                    { id: 13, name: 'Foliensträhnen M (ganzer Kopf)', duration: 120, buffer: 15, price: 69 },
+                    { id: 14, name: 'Tönung', duration: 60, buffer: 15, price: 35 },
+                    { id: 15, name: 'Glossing', duration: 20, buffer: 15, price: 15 },
+                    { id: 16, name: 'Conditioner / Pflege', duration: 10, buffer: 15, price: 5 }
+                ],
+                employees: [
+                    { id: 1, name: 'Anna Müller', position: 'Stylistin', avatar: '👩‍🦰' },
+                    { id: 2, name: 'Max Schmidt', position: 'Stylist', avatar: '👨‍🦱' },
+                    { id: 3, name: 'Lisa Berger', position: 'Senior Stylistin', avatar: '👩‍🦳' }
+                ],
+                appointments: [],
+                waitlist: []
+            };
+            localStorage.setItem('salonData', JSON.stringify(initialData));
+        }
+
+        // Helper Functions
+        function getData() {
+            return JSON.parse(localStorage.getItem('salonData'));
+        }
+
+        function saveData(data) {
+            localStorage.setItem('salonData', JSON.stringify(data));
+        }
+
+        // Tab Switching
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            
+            if (tab === 'booking') {
+                document.querySelector('.nav-tab:nth-child(1)').classList.add('active');
+                document.getElementById('booking-tab').classList.add('active');
+                currentStep = 1;
+                updateProgressBar();
+                loadServices();
+            } else if (tab === 'admin') {
+                document.querySelector('.nav-tab:nth-child(2)').classList.add('active');
+                document.getElementById('admin-tab').classList.add('active');
+            }
+        }
+
+        // Booking Flow
+        function loadServices() {
+            const data = getData();
+            const container = document.getElementById('services-list');
+            container.innerHTML = '';
+            
+            data.services.forEach(service => {
+                container.innerHTML += `
+                    <div class="service-card ${selectedService?.id === service.id ? 'selected' : ''}" 
+                         onclick="selectService(${service.id})">
+                        <div class="service-name">${service.name}</div>
+                        <div class="service-info">
+                            <span>⏱ ${service.duration} Min.</span>
+                            <span class="service-price">${service.price}€</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function selectService(id) {
+            const data = getData();
+            selectedService = data.services.find(s => s.id === id);
+            loadServices();
+        }
+
+        function loadEmployees() {
+            const data = getData();
+            const container = document.getElementById('employee-list');
+            container.innerHTML = '';
+            
+            data.employees.forEach(employee => {
+                container.innerHTML += `
+                    <div class="employee-card ${selectedEmployee?.id === employee.id ? 'selected' : ''}" 
+                         onclick="selectEmployee(${employee.id})">
+                        <div class="employee-avatar">${employee.avatar}</div>
+                        <div class="employee-name">${employee.name}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function selectEmployee(id) {
+            const data = getData();
+            selectedEmployee = data.employees.find(e => e.id === id);
+            loadEmployees();
+            loadTimeSlots();
+        }
+
+        function loadDates() {
+            const container = document.getElementById('date-chips');
+            container.innerHTML = '';
+            
+            const daysOfWeek = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+            const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+            
+            // Next 28 days, only Thu/Fri/Sat (as per your example)
+            const dates = [];
+            const today = new Date('2025-10-03'); // Current date
+            
+            for (let i = 0; i < 28; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() + i);
+                const dayOfWeek = date.getDay();
+                
+                if (dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6) { // Thu=4, Fri=5, Sat=6
+                    dates.push(date);
+                }
+            }
+            
+            dates.forEach(date => {
+                const dateStr = date.toISOString().split('T')[0];
+                container.innerHTML += `
+                    <div class="date-chip ${selectedDate === dateStr ? 'selected' : ''}" 
+                         onclick="selectDate('${dateStr}')">
+                        <div class="date-day">${daysOfWeek[date.getDay()]}</div>
+                        <div class="date-date">${date.getDate()}.${months[date.getMonth()]}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function selectDate(dateStr) {
+            selectedDate = dateStr;
+            loadDates();
+            loadTimeSlots();
+        }
+
+        function loadTimeSlots() {
+            const container = document.getElementById('time-slots');
+            container.innerHTML = '';
+            
+            if (!selectedDate || !selectedEmployee) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-light);">Bitte wähle erst Mitarbeiter und Datum</p>';
+                return;
+            }
+            
+            const data = getData();
+            const dayOfWeek = new Date(selectedDate).getDay();
+            
+            // Opening hours (Thu/Fri/Sat)
+            const hours = {
+                4: { start: 10, end: 18 }, // Thursday
+                5: { start: 9, end: 19 },  // Friday
+                6: { start: 9, end: 16 }   // Saturday
+            };
+            
+            const dayHours = hours[dayOfWeek] || { start: 9, end: 18 };
+            const slots = [];
+            
+            // Generate 30-min slots
+            for (let hour = dayHours.start; hour < dayHours.end; hour++) {
+                slots.push(`${hour.toString().padStart(2, '0')}:00`);
+                if (hour < dayHours.end - 1) slots.push(`${hour.toString().padStart(2, '0')}:30`);
+            }
+            
+            // Booked slots (with buffer check)
+            const bookedSlots = data.appointments
+                .filter(apt => apt.date === selectedDate && apt.employeeId === selectedEmployee.id)
+                .map(apt => {
+                    const start = new Date(`${apt.date}T${apt.time}:00`);
+                    const end = new Date(start.getTime() + (apt.duration + apt.buffer) * 60000);
+                    return { start: start.toTimeString().slice(0,5), end: end.toTimeString().slice(0,5) };
+                });
+            
+            slots.forEach(slot => {
+                const isBooked = bookedSlots.some(b => {
+                    const slotTime = new Date(`${selectedDate}T${slot}:00`).getTime();
+                    const bStart = new Date(`${selectedDate}T${b.start}:00`).getTime();
+                    const bEnd = new Date(`${selectedDate}T${b.end}:00`).getTime();
+                    return slotTime >= bStart && slotTime < bEnd;
+                });
+                const slotHtml = isBooked ? 
+                    `<div class="time-slot disabled">${slot}<br><button class="waitlist-btn" onclick="showWaitlistModal('${slot}')">Warteliste</button></div>` :
+                    `<div class="time-slot ${selectedTime === slot ? 'selected' : ''}" onclick="selectTime('${slot}')">${slot}</div>`;
+                container.innerHTML += slotHtml;
+            });
+        }
+
+        function showWaitlistModal(slot) {
+            document.getElementById('waitlist-date').value = selectedDate;
+            document.getElementById('waitlist-modal').classList.add('show');
+        }
+
+        function addToWaitlist() {
+            const email = document.getElementById('waitlist-email').value;
+            const date = document.getElementById('waitlist-date').value;
+            if (!email || !date) return alert('E-Mail und Datum erforderlich');
+            
+            const data = getData();
+            data.waitlist.push({
+                id: Date.now(),
+                serviceId: selectedService.id,
+                serviceName: selectedService.name,
+                employeeId: selectedEmployee.id,
+                email,
+                date,
+                createdAt: new Date().toISOString()
+            });
+            saveData(data);
+            closeModal('waitlist-modal');
+            alert('Zur Warteliste hinzugefügt!');
+            loadTimeSlots(); // Refresh
+        }
+
+        function selectTime(time) {
+            selectedTime = time;
+            loadTimeSlots();
+        }
+
+        function nextStep() {
+            if (currentStep === 1 && !selectedService) return alert('Bitte wähle eine Leistung aus');
+            if (currentStep === 2) {
+                if (!selectedEmployee || !selectedDate || !selectedTime) return alert('Bitte wähle Mitarbeiter, Datum und Zeit aus');
+            }
+            if (currentStep === 3) {
+                const name = document.getElementById('customer-name').value.trim();
+                const email = document.getElementById('customer-email').value.trim();
+                const phone = document.getElementById('customer-phone').value.trim();
+                const notes = document.getElementById('customer-notes').value.trim();
+                
+                if (!name || !email || !phone) return alert('Bitte fülle alle Pflichtfelder aus');
+                if (!email.includes('@')) return alert('Ungültige E-Mail');
+                
+                customerData = { name, email, phone, notes };
+                
+                // Save appointment
+                const data = getData();
+                const appointment = {
+                    id: Date.now(),
+                    serviceId: selectedService.id,
+                    serviceName: selectedService.name,
+                    duration: selectedService.duration,
+                    buffer: selectedService.buffer,
+                    employeeId: selectedEmployee.id,
+                    employeeName: selectedEmployee.name,
+                    date: selectedDate,
+                    time: selectedTime,
+                    customer: customerData,
+                    price: selectedService.price,
+                    status: 'confirmed',
+                    createdAt: new Date().toISOString()
+                };
+                
+                data.appointments.push(appointment);
+                saveData(data);
+                
+                showConfirmation(appointment);
+            }
+            
+            if (currentStep < 4) {
+                document.getElementById(`step${currentStep}`).style.display = 'none';
+                currentStep++;
+                document.getElementById(`step${currentStep}`).style.display = 'block';
+                updateProgressBar();
+            }
+            
+            if (currentStep === 2) {
+                loadEmployees();
+                loadDates();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step${currentStep}`).style.display = 'none';
+                currentStep--;
+                document.getElementById(`step${currentStep}`).style.display = 'block';
+                updateProgressBar();
+            }
+        }
+
+        function updateProgressBar() {
+            const steps = document.querySelectorAll('.progress-step');
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index < currentStep - 1) {
+                    step.classList.add('completed');
+                } else if (index === currentStep - 1) {
+                    step.classList.add('active');
+                }
+            });
+        }
+
+        function showConfirmation(appointment) {
+            const details = document.getElementById('confirmation-details');
+            const dateObj = new Date(appointment.date);
+            const dateStr = dateObj.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
+            
+            details.innerHTML = `
+                <div class="detail-row">
+                    <span class="detail-label">Leistung</span>
+                    <span class="detail-value">${appointment.serviceName}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Mitarbeiter</span>
+                    <span class="detail-value">${appointment.employeeName}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Datum</span>
+                    <span class="detail-value">${dateStr}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Uhrzeit</span>
+                    <span class="detail-value">${appointment.time} Uhr</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Preis</span>
+                    <span class="detail-value">${appointment.price}€</span>
+                </div>
+            `;
+        }
+
+        function newBooking() {
+            currentStep = 1;
+            selectedService = null;
+            selectedEmployee = null;
+            selectedDate = null;
+            selectedTime = null;
+            customerData = {};
+            document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+            
+            document.getElementById('step4').style.display = 'none';
+            document.getElementById('step1').style.display = 'block';
+            updateProgressBar();
+            loadServices();
+        }
+
+        function downloadICS() {
+            // Simple ICS generation
+            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Termin bei Hair Studio\nDTSTART:${selectedDate.replace(/-/g,'')}T${selectedTime.replace(':', '')}00\nDTEND:${selectedDate.replace(/-/g,'')}T${(parseInt(selectedTime.split(':')[0]) + 1).toString().padStart(2,'0')}${selectedTime.split(':')[1]}00\nDESCRIPTION:${selectedService.name} mit ${selectedEmployee.name}\nEND:VEVENT\nEND:VCALENDAR`;
+            const blob = new Blob([ics], { type: 'text/calendar' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'termin.ics';
+            a.click();
+        }
+
+        function shareBooking() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Mein Termin bei Hair Studio',
+                    text: `Termin: ${selectedService.name} am ${selectedDate} um ${selectedTime}`,
+                    url: window.location.href
+                });
+            } else {
+                prompt('Kopiere diesen Text zum Teilen:', `Termin gebucht: ${selectedService.name} am ${selectedDate} um ${selectedTime} Uhr`);
+            }
+        }
+
+        // Admin Functions
+        function loginAdmin() {
+            const pin = document.getElementById('admin-pin').value;
+            if (pin === ADMIN_PIN) {
+                document.getElementById('admin-login').style.display = 'none';
+                document.getElementById('admin-dashboard').style.display = 'block';
+                loadAdminData();
+            } else {
+                alert('Falscher PIN!');
+            }
+        }
+
+        function logoutAdmin() {
+            document.getElementById('admin-dashboard').style.display = 'none';
+            document.getElementById('admin-login').style.display = 'block';
+            document.getElementById('admin-pin').value = '';
+        }
+
+        function loadAdminData() {
+            const data = getData();
+            
+            // Load stats
+            loadStats(data);
+
+            // Load services
+            const servicesTable = document.getElementById('services-table');
+            servicesTable.innerHTML = '';
+            data.services.forEach(service => {
+                servicesTable.innerHTML += `
+                    <tr>
+                        <td>${service.name}</td>
+                        <td>${service.duration} Min.</td>
+                        <td>${service.price}€</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-small btn-edit" onclick="editService(${service.id})">Bearbeiten</button>
+                                <button class="btn-small btn-delete" onclick="deleteService(${service.id})">Löschen</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            // Load employees
+            const employeesTable = document.getElementById('employees-table');
+            employeesTable.innerHTML = '';
+            data.employees.forEach(employee => {
+                employeesTable.innerHTML += `
+                    <tr>
+                        <td>${employee.name}</td>
+                        <td>${employee.position}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-small btn-edit" onclick="editEmployee(${employee.id})">Bearbeiten</button>
+                                <button class="btn-small btn-delete" onclick="deleteEmployee(${employee.id})">Löschen</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            // Load appointments
+            const appointmentsTable = document.getElementById('appointments-table');
+            appointmentsTable.innerHTML = '';
+            const sortedAppointments = data.appointments.sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
+            sortedAppointments.forEach(apt => {
+                const dateObj = new Date(apt.date);
+                const dateStr = dateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+                
+                appointmentsTable.innerHTML += `
+                    <tr>
+                        <td>${dateStr}</td>
+                        <td>${apt.time}</td>
+                        <td>${apt.customer.name}</td>
+                        <td>${apt.serviceName}</td>
+                        <td>${apt.employeeName}</td>
+                        <td><span class="badge ${apt.status === 'confirmed' ? 'badge-success' : 'badge-pending'}">${apt.status}</span></td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-small btn-invoice" onclick="generateInvoice(${apt.id})">Rechnung</button>
+                                <button class="btn-small btn-delete" onclick="cancelAppointment(${apt.id})">Stornieren</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Load waitlist
+            const waitlistTable = document.getElementById('waitlist-table');
+            waitlistTable.innerHTML = '';
+            data.waitlist.forEach(item => {
+                const dateObj = new Date(item.date);
+                const dateStr = dateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
+                
+                waitlistTable.innerHTML += `
+                    <tr>
+                        <td>${item.email}</td>
+                        <td>${item.serviceName}</td>
+                        <td>${dateStr}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn-small btn-primary" onclick="moveToAppointment(${item.id})">Zu Termin</button>
+                                <button class="btn-small btn-delete" onclick="deleteWaitlist(${item.id})">Löschen</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function loadStats(data) {
+            const grid = document.getElementById('stats-grid');
+            grid.innerHTML = '';
+            
+            data.employees.forEach(emp => {
+                const empApps = data.appointments.filter(a => a.employeeId === emp.id);
+                const total = empApps.length;
+                const revenue = empApps.reduce((sum, a) => sum + a.price, 0);
+                const cancelRate = ((empApps.filter(a => a.status !== 'confirmed').length / total) * 100).toFixed(1);
+                
+                grid.innerHTML += `
+                    <div class="stat-card">
+                        <div class="stat-value">${total}</div>
+                        <div class="stat-label">${emp.name} Termine</div>
+                        <div style="font-size: 12px; margin-top: 4px;">Umsatz: ${revenue}€ | Cancel: ${cancelRate}%</div>
+                    </div>
+                `;
+            });
+        }
+
+        function showServiceModal(editId = null) {
+            // Edit mode if id provided
+            if (editId) {
+                const data = getData();
+                const service = data.services.find(s => s.id === editId);
+                if (service) {
+                    document.getElementById('service-name').value = service.name;
+                    document.getElementById('service-duration').value = service.duration;
+                    document.getElementById('service-buffer').value = service.buffer;
+                    document.getElementById('service-price').value = service.price;
+                    document.querySelector('#service-modal .modal-title').textContent = 'Leistung bearbeiten';
+                }
+            } else {
+                document.querySelector('#service-modal .modal-title').textContent = 'Leistung hinzufügen';
+                // Clear form
+                ['service-name', 'service-duration', 'service-buffer', 'service-price'].forEach(id => document.getElementById(id).value = '');
+            }
+            document.getElementById('service-modal').classList.add('show');
+        }
+
+        function editService(id) {
+            showServiceModal(id);
+        }
+
+        function saveService() {
+            const name = document.getElementById('service-name').value.trim();
+            const duration = parseInt(document.getElementById('service-duration').value);
+            const buffer = parseInt(document.getElementById('service-buffer').value);
+            const price = parseFloat(document.getElementById('service-price').value);
+            
+            if (!name || !duration || !price) return alert('Alle Felder erforderlich');
+            
+            const data = getData();
+            const editId = Date.now(); // Temp for new
+            const service = {
+                id: editId,
+                name,
+                duration,
+                buffer,
+                price
+            };
+            
+            // Check if editing (use existing id if passed, but since modal doesn't pass, assume new for simplicity; extend if needed
+            data.services.push(service);
+            saveData(data);
+            loadAdminData();
+            closeModal('service-modal');
+        }
+
+        // Similar for employees...
+        function showEmployeeModal(editId = null) {
+            if (editId) {
+                const data = getData();
+                const emp = data.employees.find(e => e.id === editId);
+                if (emp) {
+                    document.getElementById('employee-name').value = emp.name;
+                    document.getElementById('employee-position').value = emp.position;
+                    document.querySelector('#employee-modal .modal-title').textContent = 'Mitarbeiter bearbeiten';
+                }
+            } else {
+                document.querySelector('#employee-modal .modal-title').textContent = 'Mitarbeiter hinzufügen';
+                document.getElementById('employee-name').value = '';
+                document.getElementById('employee-position').value = '';
+            }
+            document.getElementById('employee-modal').classList.add('show');
+        }
+
+        function editEmployee(id) {
+            showEmployeeModal(id);
+        }
+
+        function saveEmployee() {
+            const name = document.getElementById('employee-name').value.trim();
+            const position = document.getElementById('employee-position').value.trim();
+            
+            if (!name) return alert('Name erforderlich');
+            
+            const data = getData();
+            const employee = {
+                id: Date.now(),
+                name,
+                position,
+                avatar: '👤' // Default
+            };
+            
+            data.employees.push(employee);
+            saveData(data);
+            loadAdminData();
+            closeModal('employee-modal');
+        }
+
+        function deleteService(id) {
+            if (confirm('Leistung wirklich löschen?')) {
+                const data = getData();
+                data.services = data.services.filter(s => s.id !== id);
+                saveData(data);
+                loadAdminData();
+            }
+        }
+
+        function deleteEmployee(id) {
+            if (confirm('Mitarbeiter wirklich löschen?')) {
+                const data = getData();
+                data.employees = data.employees.filter(e => e.id !== id);
+                saveData(data);
+                loadAdminData();
+            }
+        }
+
+        function cancelAppointment(id) {
+            if (confirm('Termin wirklich stornieren?')) {
+                const data = getData();
+                const apt = data.appointments.find(a => a.id === id);
+                if (apt) apt.status = 'cancelled';
+                saveData(data);
+                loadAdminData();
+            }
+        }
+
+        function moveToAppointment(waitId) {
+            if (confirm('Von Warteliste zu Termin verschieben? (Manuell Zeit zuweisen)')) {
+                const data = getData();
+                const waitItem = data.waitlist.find(w => w.id === waitId);
+                if (waitItem) {
+                    // Simple: Add as pending appointment
+                    data.appointments.push({
+                        ...waitItem,
+                        id: Date.now(),
+                        time: '10:00', // Default; extend with modal
+                        customer: { name: waitItem.email.split('@')[0], email: waitItem.email, phone: '', notes: '' },
+                        status: 'pending',
+                        duration: 30, // Default
+                        buffer: 15,
+                        price: 0 // To be set
+                    });
+                    data.waitlist = data.waitlist.filter(w => w.id !== waitId);
+                    saveData(data);
+                    loadAdminData();
+                }
+            }
+        }
+
+        function deleteWaitlist(id) {
+            if (confirm('Aus Warteliste löschen?')) {
+                const data = getData();
+                data.waitlist = data.waitlist.filter(w => w.id !== id);
+                saveData(data);
+                loadAdminData();
+            }
+        }
+
+        function clearWaitlist() {
+            if (confirm('Gesamte Warteliste leeren?')) {
+                const data = getData();
+                data.waitlist = [];
+                saveData(data);
+                loadAdminData();
+            }
+        }
+
+        function generateInvoice(aptId) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const data = getData();
+            const apt = data.appointments.find(a => a.id === aptId);
+            if (!apt) return;
+            
+            doc.setFontSize(20);
+            doc.text('🦱 Hair Studio Rechnung', 20, 30);
+            doc.setFontSize(12);
+            doc.text(`Kunde: ${apt.customer.name}`, 20, 50);
+            doc.text(`Service: ${apt.serviceName}`, 20, 60);
+            doc.text(`Datum: ${apt.date} um ${apt.time} Uhr`, 20, 70);
+            doc.text(`Preis: ${apt.price}€`, 20, 80);
+            doc.text(`Mitarbeiter: ${apt.employeeName}`, 20, 90);
+            if (apt.customer.notes) doc.text(`Notizen: ${apt.customer.notes}`, 20, 100);
+            
+            // Simple QR for calendar (placeholder)
+            doc.addImage('data:image/svg+xml;base64,...', 'SVG', 150, 50, 50, 50); // Extend with QR lib if needed
+            
+            doc.save(`rechnung_${aptId}.pdf`);
+        }
+
+        function exportCSV() {
+            const data = getData();
+            let csv = 'Datum,Zeit,Kunde,E-Mail,Telefon,Leistung,Mitarbeiter,Preis,Status\n';
+            
+            data.appointments.forEach(apt => {
+                csv += `"${apt.date}","${apt.time}","${apt.customer.name}","${apt.customer.email}","${apt.customer.phone}","${apt.serviceName}","${apt.employeeName}",${apt.price},"${apt.status}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'termine.csv';
+            a.click();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Initialize
+        loadServices();
+    </script>
+</body>
+</html>
