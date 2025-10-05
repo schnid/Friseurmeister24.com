@@ -97,11 +97,20 @@ export default function ProjektterminSeite() {
   const [createStep, setCreateStep] = React.useState("form"); // form | success
   const [draft, setDraft] = React.useState({ date: "", time: "", name: "", serviceId: SERVICES[0].id, stylist: "Kevin", duration: serviceDur(SERVICES[0].id) });
 
-  const [appointments, setAppointments] = React.useState([
-    { id: 1, date: "2025-10-25", time: "11:30", name: "Maya K.", serviceId: 1, stylist: "Kevin", status: "neu", duration: serviceDur(1) },
-    { id: 2, date: "2025-10-25", time: "13:00", name: "Omar R.", serviceId: 10, stylist: "Lea", status: "bestätigt", duration: serviceDur(10) },
-    { id: 3, date: "2025-10-26", time: "10:30", name: "Tina S.", serviceId: 12, stylist: "Kevin", status: "neu", duration: serviceDur(12) },
-  ]);
+  const [appointments, setAppointments] = React.useState(() => {
+    try {
+      const raw = localStorage.getItem("salon_appts");
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) return arr;
+      }
+    } catch(_){}
+    return [
+      { id: 1, date: "2025-10-25", time: "11:30", name: "Maya K.", serviceId: 1, stylist: "Kevin", status: "neu", duration: serviceDur(1) },
+      { id: 2, date: "2025-10-25", time: "13:00", name: "Omar R.", serviceId: 10, stylist: "Lea", status: "bestätigt", duration: serviceDur(10) },
+      { id: 3, date: "2025-10-26", time: "10:30", name: "Tina S.", serviceId: 12, stylist: "Kevin", status: "neu", duration: serviceDur(12) },
+    ];
+  });
 
   // Persistente Admin-Session (Demo)
   React.useEffect(() => {
@@ -110,6 +119,11 @@ export default function ProjektterminSeite() {
       if (ok) setAdminAuthenticated(true);
     } catch (_) {}
   }, []);
+
+  // 🔒 Termine persistent speichern
+  React.useEffect(() => {
+    try { localStorage.setItem("salon_appts", JSON.stringify(appointments)); } catch(_){}
+  }, [appointments]);
 
   // DEV Self-Tests
   React.useEffect(()=>{
