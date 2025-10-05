@@ -1,1702 +1,753 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hair Studio - Termin buchen</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1e40af;
-            --secondary: #f3f4f6;
-            --text: #1f2937;
-            --text-light: #6b7280;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --border: #e5e7eb;
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            color: var(--text);
-            background: var(--gradient);
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            min-height: 100vh;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            padding: 30px 0;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 30px;
-        }
-
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-        }
-
-        .tagline {
-            color: var(--text-light);
-            font-size: 14px;
-        }
-
-        /* Navigation */
-        .nav-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .nav-tab {
-            padding: 12px 20px;
-            background: none;
-            border: none;
-            color: var(--text-light);
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s;
-        }
-
-        .nav-tab.active {
-            color: var(--primary);
-        }
-
-        .nav-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--gradient);
-        }
-
-        /* Screens */
-        .screen {
-            display: none;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Progress Steps */
-        .progress-bar {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-            position: relative;
-        }
-
-        .progress-bar::before {
-            content: '';
-            position: absolute;
-            top: 15px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--border);
-            z-index: 0;
-            transition: background 0.3s;
-        }
-
-        .progress-step {
-            background: white;
-            border: 2px solid var(--border);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-light);
-            position: relative;
-            z-index: 1;
-            transition: all 0.3s;
-        }
-
-        .progress-step.completed {
-            background: var(--success);
-            border-color: var(--success);
-            color: white;
-        }
-
-        .progress-step.active {
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: scale(1.1);
-        }
-
-        /* Cards */
-        .service-card {
-            background: white;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--gradient);
-            transform: scaleX(0);
-            transition: transform 0.3s;
-        }
-
-        .service-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-4px);
-        }
-
-        .service-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .service-card.selected {
-            border-color: var(--primary);
-            background: linear-gradient(to right, rgba(37, 99, 235, 0.08), rgba(37, 99, 235, 0.04));
-        }
-
-        .service-name {
-            font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-
-        .service-info {
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-light);
-            font-size: 14px;
-        }
-
-        .service-price {
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        /* Employee Selection */
-        .employee-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .employee-card {
-            background: white;
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .employee-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .employee-card.selected {
-            border-color: var(--primary);
-            background: linear-gradient(to bottom, rgba(37, 99, 235, 0.08), rgba(37, 99, 235, 0.04));
-        }
-
-        .employee-avatar {
-            width: 50px;
-            height: 50px;
-            background: var(--gradient);
-            border-radius: 50%;
-            margin: 0 auto 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-
-        .employee-name {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        /* Date & Time Selection */
-        .date-selector {
-            margin-bottom: 24px;
-        }
-
-        .date-chips {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-        }
-
-        .date-chip {
-            background: white;
-            border: 2px solid var(--border);
-            border-radius: 20px;
-            padding: 8px 16px;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-            min-width: 80px;
-            flex-shrink: 0;
-        }
-
-        .date-chip:hover {
-            border-color: var(--primary);
-        }
-
-        .date-chip.selected {
-            background: var(--gradient);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        .date-day {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-
-        .date-date {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .time-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-        }
-
-        .time-slot {
-            background: white;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .time-slot:hover:not(.disabled) {
-            border-color: var(--primary);
-            background: var(--secondary);
-            transform: scale(1.05);
-        }
-
-        .time-slot.selected {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        .time-slot.disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            background: var(--danger);
-            color: white;
-        }
-
-        .waitlist-btn {
-            background: var(--warning);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-top: 4px;
-        }
-
-        /* Form */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            font-size: 14px;
-            color: var(--text);
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        /* Buttons */
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-primary {
-            background: var(--gradient);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .btn-secondary {
-            background: var(--secondary);
-            color: var(--text);
-            margin-bottom: 12px;
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 12px;
-            margin-top: 24px;
-        }
-
-        /* Confirmation */
-        .confirmation-card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            text-align: center;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .success-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--success);
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 30px;
-        }
-
-        .confirmation-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .confirmation-details {
-            background: var(--secondary);
-            border-radius: 8px;
-            padding: 16px;
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            color: var(--text-light);
-            font-size: 14px;
-        }
-
-        .detail-value {
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        /* Admin Styles */
-        .admin-login {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 320px;
-            margin: 50px auto;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .admin-title {
-            font-size: 20px;
-            font-weight: 700;
-        }
-
-        .admin-section {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .admin-section-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text);
-        }
-
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: var(--gradient);
-            color: white;
-            padding: 16px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            overflow-x: auto;
-            display: block;
-        }
-
-        .table th {
-            text-align: left;
-            padding: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-light);
-            border-bottom: 2px solid var(--border);
-        }
-
-        .table td {
-            padding: 12px 8px;
-            font-size: 14px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-
-        .badge-pending {
-            background: rgba(251, 191, 36, 0.1);
-            color: var(--warning);
-        }
-
-        .action-btns {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-edit {
-            background: var(--secondary);
-            color: var(--text);
-        }
-
-        .btn-delete {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-
-        .btn-invoice {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-edit:hover, .btn-invoice:hover {
-            background: var(--border);
-        }
-
-        .btn-delete:hover {
-            background: rgba(239, 68, 68, 0.2);
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            padding: 20px;
-            animation: fadeIn 0.3s;
-        }
-
-        .modal.show {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 400px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--text-light);
-            cursor: pointer;
-        }
-
-        /* Responsive */
-        @media (max-width: 480px) {
-            .container {
-                padding: 12px;
-            }
-
-            .time-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .employee-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .nav-tabs {
-                flex-direction: column;
-                gap: 0;
-            }
-
-            .nav-tab {
-                border-bottom: 1px solid var(--border);
-                text-align: left;
-            }
-
-            .nav-tab.active::after {
-                display: none;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">✂️ Hair Studio</div>
-            <div class="tagline">Professionelle Buchung – Modern & Einfach</div>
+import React from "react";
+import { motion } from "framer-motion";
+import { Calendar, Clock, ShieldCheck, ChevronRight, Phone, Mail, Info, MapPin, Scissors, Settings, Check, X, Edit, Search, Filter, UserCheck, UserX, Trash2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+// ✅ Salon-Terminseite (Deutsch)
+// Hinweise:
+// - Ersetze BOOKING_URL unten mit deinem echten Buchungslink (z. B. Calendly, cal.com, Terminland, Shore, etc.)
+// - Admin-Login ist clientseitig (Demo). Für echte Sicherheit bitte serverseitige Auth verwenden.
+
+const BOOKING_URL = "https://cal.com/dein-account/dein-event"; // oder Calendly-URL
+
+// Services (eingebettet). name, preis, dauer (Minuten)
+const SERVICES = [
+  { id: 1, name: "Maschinenhaarschnitt (Herren)", preis: "11 €", dauer: 20 },
+  { id: 2, name: "Trockenschnitt (Herren)", preis: "15 €", dauer: 25 },
+  { id: 3, name: "Waschen, Schneiden (Herren)", preis: "17 €", dauer: 30 },
+  { id: 4, name: "Waschen, Schneiden, Föhnen (Herren)", preis: "19,50 €", dauer: 35 },
+  { id: 5, name: "Trockenschnitt (Damen)", preis: "19 €", dauer: 30 },
+  { id: 6, name: "Waschen, Schneiden (Damen)", preis: "21 €", dauer: 35 },
+  { id: 7, name: "Waschen, Schneiden, Föhnen (kurz)", preis: "23 €", dauer: 45 },
+  { id: 8, name: "Waschen, Schneiden, Föhnen (mittel)", preis: "28 €", dauer: 60 },
+  { id: 9, name: "Waschen, Schneiden, Föhnen (lang)", preis: "33 €", dauer: 90 },
+  { id: 10, name: "Ansatzfarbe", preis: "43 €", dauer: 90 },
+  { id: 11, name: "Foliensträhnen XS (bis 15)", preis: "29 €", dauer: 60 },
+  { id: 12, name: "Foliensträhnen S (halber Kopf)", preis: "49 €", dauer: 90 },
+  { id: 13, name: "Foliensträhnen M (ganzer Kopf)", preis: "69 €", dauer: 120 },
+  { id: 14, name: "Tönung", preis: "35 €", dauer: 60 },
+  { id: 15, name: "Glossing", preis: "15 €", dauer: 20 },
+  { id: 16, name: "Conditioner / Pflege", preis: "+5 €", dauer: 10 },
+];
+
+// Öffnungszeiten (0=So ... 6=Sa)
+const OPENING = {
+  4: { start: "11:30", end: "17:00" }, // Do
+  5: { start: "11:30", end: "17:00" }, // Fr
+  6: { start: "10:00", end: "14:00" }, // Sa
+};
+
+// ⚠️ Admin-Passwort auf globalThis, damit kein "Identifier already declared" bei HMR
+if (typeof globalThis !== "undefined") {
+  globalThis.__SALON_ADMIN_PW = "xxxx"; // vom Besitzer gesetzt
+}
+
+const fadeIn = {
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+// Helpers
+const pad = (n) => (n < 10 ? `0${n}` : `${n}`);
+function parseTime(t) { const [h, m] = t.split(":").map(Number); return h*60+m; }
+function fmtHM(min) { const h = Math.floor(min/60); const m = min%60; return `${pad(h)}:${pad(m)}`; }
+function addDays(date, d) { const x = new Date(date); x.setDate(x.getDate()+d); return x; }
+function toISODate(d) { return d.toISOString().slice(0,10); }
+function toMinutes(hhmm){ const [h,m] = hhmm.split(":").map(Number); return h*60+m; }
+function addMinutes(hhmm, mins){ const t = toMinutes(hhmm)+mins; const H = Math.floor(((t%1440)+1440)%1440/60); const M = ((t%60)+60)%60; const pad=(n)=>n.toString().padStart(2,'0'); return `${pad(H)}:${pad(M)}`; }
+function overlap(startA, durA, startB, durB){ const a0=toMinutes(startA), a1=a0+durA; const b0=toMinutes(startB), b1=b0+durB; return a0 < b1 && b0 < a1; }
+function serviceDur(id){ return SERVICES.find(s=>s.id===Number(id))?.dauer ?? 30; }
+function getWeekStart(date=new Date()) { const d = new Date(date); const day = d.getDay(); // 0=So
+  const diff = (day===0? -6 : 1-day); // Montag als Wochenstart
+  return addDays(d, diff);
+}
+function firstOpenDateFrom(startDate){
+  for(let i=0;i<14;i++){
+    const d = addDays(startDate, i);
+    if(OPENING[d.getDay()]) return d;
+  }
+  return startDate;
+}
+function slotsForDate(dateStr){
+  const d = new Date(dateStr);
+  const conf = OPENING[d.getDay()];
+  if(!conf) return [];
+  const start = parseTime(conf.start); const end = parseTime(conf.end);
+  const out = []; for(let t=start; t<end; t+=30) out.push(fmtHM(t));
+  return out;
+}
+
+export default function ProjektterminSeite() {
+  const [email, setEmail] = React.useState("");
+  const [adminOpen, setAdminOpen] = React.useState(false);
+  const [adminTab, setAdminTab] = React.useState("kalender");
+  const [adminAuthenticated, setAdminAuthenticated] = React.useState(false);
+  const [adminPwInput, setAdminPwInput] = React.useState("");
+  const [query, setQuery] = React.useState("");
+  const [dateFilter, setDateFilter] = React.useState("");
+
+  // Week calendar state
+  const [weekStart, setWeekStart] = React.useState(getWeekStart());
+  const [createOpen, setCreateOpen] = React.useState(false);
+  const [createStep, setCreateStep] = React.useState("form"); // form | success
+  const [draft, setDraft] = React.useState({ date: "", time: "", name: "", serviceId: SERVICES[0].id, stylist: "Kevin", duration: serviceDur(SERVICES[0].id) });
+
+  const [appointments, setAppointments] = React.useState([
+    { id: 1, date: "2025-10-25", time: "11:30", name: "Maya K.", serviceId: 1, stylist: "Kevin", status: "neu", duration: serviceDur(1) },
+    { id: 2, date: "2025-10-25", time: "13:00", name: "Omar R.", serviceId: 10, stylist: "Lea", status: "bestätigt", duration: serviceDur(10) },
+    { id: 3, date: "2025-10-26", time: "10:30", name: "Tina S.", serviceId: 12, stylist: "Kevin", status: "neu", duration: serviceDur(12) },
+  ]);
+
+  // Persistente Admin-Session (Demo)
+  React.useEffect(() => {
+    try {
+      const ok = localStorage.getItem("salon_admin_ok") === "1";
+      if (ok) setAdminAuthenticated(true);
+    } catch (_) {}
+  }, []);
+
+  // DEV Self-Tests
+  React.useEffect(()=>{
+    // Test: Slot-Erzeugung Do 11:30–17:00 → mindestens 11 Slots in 30min Raster
+    const slots = []; for(let t=parseTime("11:30"); t<parseTime("17:00"); t+=30) slots.push(fmtHM(t));
+    if(slots.length < 11) console.error("Test fehlgeschlagen: Erwartet >=11 Slots, erhalten:", slots.length);
+  },[]);
+
+  // Calendar helpers
+  const days = Array.from({length:7}, (_,i)=> addDays(weekStart, i));
+  const isOpenAt = (d) => OPENING[d.getDay()];
+  const apptsOn = (dateStr) => appointments.filter(a=>a.date===dateStr);
+  const serviceById = (id) => SERVICES.find(s=>s.id===Number(id));
+
+  // Create appointment helpers
+  function openCreate(dateStr, timeStr){
+    setDraft({ date: dateStr, time: timeStr || "", name: "", serviceId: SERVICES[0].id, stylist: "Kevin" });
+    setCreateStep("form");
+    setCreateOpen(true);
+  }
+  function defaultDateTimeForNew(){
+    // Nimmt erste geöffnete Tages/Slot-Kombi ab heute
+    const start = firstOpenDateFrom(new Date());
+    const dateStr = toISODate(start);
+    const allSlots = slotsForDate(dateStr);
+    // freie Slots filtern
+    const taken = new Set(apptsOn(dateStr).map(a=>a.time));
+    const free = allSlots.filter(s=>!taken.has(s));
+    return { date: dateStr, time: free[0] || "" };
+  }
+  function saveDraft(){
+    const conflict = appointments.some(a=>a.date===draft.date && a.time===draft.time);
+    if(conflict) { alert("Dieser Slot ist bereits belegt."); return; }
+    if(!draft.name || !draft.date || !draft.time) { alert("Bitte Name, Datum und Uhrzeit angeben."); return; }
+    const id = Math.max(0, ...appointments.map(a=>a.id)) + 1;
+    const newAppt = { id, date: draft.date, time: draft.time, name: draft.name.trim(), serviceId: Number(draft.serviceId), stylist: draft.stylist||"Kevin", status: "neu" };
+    setAppointments([newAppt, ...appointments]);
+    setCreateStep("success");
+  }
+
+  // Week navigation
+  function shiftWeek(delta){ setWeekStart(addDays(weekStart, delta*7)); }
+
+  // Daten für „Neuer Termin“-Dialog (Termine-Tab)
+  const newDefaults = React.useMemo(()=> defaultDateTimeForNew(), [appointments]);
+
+  return (
+    <div className="min-h-screen bg-[radial-gradient(1200px_600px_at_50%_-200px,rgba(56,189,248,0.15),transparent)] from-white to-slate-50 text-slate-900">
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-white/60 supports-[backdrop-filter]:backdrop-blur border-b border-white/40">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="size-9 rounded-2xl bg-slate-900 text-white grid place-items-center"><Scissors className="size-5" /></div>
+            <span className="font-semibold">Salontermin</span>
+            <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 px-2 py-1 text-xs border border-emerald-200">★ 4.96</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <a href="#faq" className="text-sm hover:underline">FAQ</a>
+            <a href="#kontakt" className="text-sm hover:underline">Kontakt</a>
+            <Button variant="outline" className="rounded-2xl" onClick={() => setAdminOpen(true)}><Settings className="mr-2 size-4" /> Admin</Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button data-book className="bg-sky-600 text-white hover:bg-sky-700 rounded-2xl">Termin buchen</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Termin buchen</DialogTitle>
+                  <DialogDescription>
+                    Wähle einen passenden Slot. Die Buchung ist kostenlos und unverbindlich.
+                  </DialogDescription>
+                </DialogHeader>
+                {/* 👉 Variante 1: Weiterleitung per Button */}
+                <div className="flex flex-col gap-3">
+                  <a
+                    href={BOOKING_URL}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex items-center justify-center rounded-2xl border px-4 py-3 hover:bg-slate-50"
+                    aria-label="Zur externen Buchungsseite (öffnet in neuem Tab)"
+                  >
+                    Zur Buchungsseite (neuer Tab)
+                    <ChevronRight className="ml-2 size-4" />
+                  </a>
+
+                  {/* 👉 Variante 2: Direktes Embed (IFRAME) */}
+                  <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border">
+                    <iframe
+                      title="Buchungskalender"
+                      src={`${BOOKING_URL}?embed=1`}
+                      className="w-full h-full"
+                    />
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
+      </header>
 
-        <!-- Navigation Tabs -->
-        <div class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('booking')">Termin buchen</button>
-            <button class="nav-tab" onclick="switchTab('admin')">Admin</button>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-4 pt-16 pb-14 grid md:grid-cols-2 gap-10 items-center">
+        <motion.div initial="hidden" animate="show" variants={fadeIn}>
+          <h1 className="text-3xl md:text-5xl font-extrabold leading-tight">
+            Friseurtermin buchen – schnell, einfach, flexibel
+          </h1>
+          <p className="mt-4 text-slate-600 max-w-prose">
+            Schnitt, Farbe oder Styling genau so, wie du es magst. Wähle deinen Service und buche deinen Slot in 30–60 Minuten – ganz bequem online.
+          </p>
+          <div className="mt-3 rounded-xl border bg-amber-50 text-amber-900 p-3 text-sm">
+            <strong>Hinweis:</strong> Bis einschließlich <strong>24.10.2025</strong> ausgebucht. Nächste freie Termine ab <strong>25.10.2025</strong>.
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button data-book className="bg-sky-600 text-white hover:bg-sky-700 h-11 rounded-2xl">
+                  <Calendar className="mr-2 size-4" /> Jetzt Friseurtermin sichern
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Termin auswählen</DialogTitle>
+                  <DialogDescription>
+                    Du wirst zur sicheren Buchungsseite weitergeleitet.
+                  </DialogDescription>
+                </DialogHeader>
+                <a
+                  href={BOOKING_URL}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center justify-center rounded-2xl border px-4 py-3 hover:bg-slate-50"
+                >
+                  Öffnen & Termin wählen
+                  <ChevronRight className="ml-2 size-4" />
+                </a>
+              </DialogContent>
+            </Dialog>
+            <a href="#ablauf" className="inline-flex items-center text-sm underline">
+              So läuft's ab
+              <ChevronRight className="ml-1 size-4" />
+            </a>
+          </div>
+          <div className="mt-6 flex items-center gap-4 text-sm text-slate-600">
+            <div className="inline-flex items-center gap-2">
+              <Clock className="size-4" /> 30–60 Min
+            </div>
+            <div className="inline-flex items-center gap-2">
+              <ShieldCheck className="size-4" /> DSGVO-konform
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div initial="hidden" animate="show" variants={fadeIn} className="md:justify-self-end">
+          <Card className="rounded-2xl shadow-lg border-white/60 bg-white/70 supports-[backdrop-filter]:backdrop-blur">
+            <CardHeader>
+              <CardTitle>Beliebte Services</CardTitle>
+              <CardDescription>Auswahl bei der Buchung – Preise und Dauer je nach Haarlänge.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              {["Maschinenhaarschnitt (Herren)", "Waschen, Schneiden, Föhnen (kurz)", "Ansatzfarbe"].map((title, i) => (
+                <div key={i} className="rounded-xl border p-4">
+                  <div className="font-semibold">{title}</div>
+                  <div className="text-sm text-slate-600">Preis & Dauer siehst du bei der Auswahl.</div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </section>
+
+      {/* Ablauf */}
+      <section id="ablauf" className="max-w-6xl mx-auto px-4 py-10">
+        <h2 className="text-2xl md:text-3xl font-bold">So buchst du deinen Friseurtermin</h2>
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {[{step:"1",title:"Termin wählen",text:"Klicke auf „Termin buchen“ und wähle einen Slot, der für dich passt."},{step:"2",title:"Stylist auswählen",text:"Lieblings-Stylist:in auswählen – je nach Verfügbarkeit."},{step:"3",title:"Bestätigung & Erinnerung",text:"Du erhältst E‑Mail-Bestätigung und Termin‑Erinnerung."}].map((s) => (
+            <Card key={s.step} className="rounded-2xl">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="inline-flex size-7 items-center justify-center rounded-full border text-sm font-semibold">{s.step}</span>
+                  {s.title}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-slate-600">{s.text}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
+      </section>
 
-        <!-- Booking Tab -->
-        <div id="booking-tab" class="screen active">
-            <!-- Progress Bar -->
-            <div class="progress-bar" id="progress-bar">
-                <div class="progress-step active">1</div>
-                <div class="progress-step">2</div>
-                <div class="progress-step">3</div>
-                <div class="progress-step">4</div>
-            </div>
+      {/* Standort & Öffnungszeiten */}
+      <section id="standort" className="max-w-6xl mx-auto px-4 py-10">
+        <h2 className="text-2xl md:text-3xl font-bold">Standort & Öffnungszeiten</h2>
+        <div className="mt-6 grid md:grid-cols-2 gap-4">
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle>Unser Salon</CardTitle>
+              <CardDescription>Gut erreichbar, zentrale Lage</CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm text-slate-600 grid gap-2">
+              <div className="inline-flex items-center gap-2">
+                <MapPin className="size-4" /> Rather Kreuzweg 62, 40472 Düsseldorf
+              </div>
+              <a href="https://www.google.com/maps?q=Rather+Kreuzweg+62,+40472+D%C3%BCsseldorf" target="_blank" rel="noreferrer noopener" className="underline">
+                Route in Google Maps öffnen
+              </a>
+            </CardContent>
+          </Card>
 
-            <!-- Step 1: Service Selection -->
-            <div id="step1" class="booking-step active">
-                <h2 style="margin-bottom: 20px;">Wähle deine Leistung</h2>
-                <div id="services-list"></div>
-                <button class="btn btn-primary" onclick="nextStep()" style="margin-top: 20px;">Weiter</button>
-            </div>
-
-            <!-- Step 2: Employee & Time -->
-            <div id="step2" class="booking-step" style="display: none;">
-                <h2 style="margin-bottom: 20px;">Mitarbeiter & Termin</h2>
-                
-                <h3 style="font-size: 16px; margin-bottom: 12px;">Wähle deinen Stylisten</h3>
-                <div class="employee-grid" id="employee-list"></div>
-
-                <h3 style="font-size: 16px; margin-bottom: 12px;">Wähle dein Datum</h3>
-                <div class="date-selector">
-                    <div class="date-chips" id="date-chips"></div>
-                </div>
-
-                <h3 style="font-size: 16px; margin-bottom: 12px;">Verfügbare Zeiten</h3>
-                <div class="time-grid" id="time-slots"></div>
-
-                <div class="btn-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Zurück</button>
-                    <button class="btn btn-primary" onclick="nextStep()">Weiter</button>
-                </div>
-            </div>
-
-            <!-- Step 3: Customer Data -->
-            <div id="step3" class="booking-step" style="display: none;">
-                <h2 style="margin-bottom: 20px;">Deine Daten</h2>
-                
-                <div class="form-group">
-                    <label>Name *</label>
-                    <input type="text" id="customer-name" placeholder="Max Mustermann" required>
-                </div>
-
-                <div class="form-group">
-                    <label>E-Mail *</label>
-                    <input type="email" id="customer-email" placeholder="max@beispiel.de" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Telefon *</label>
-                    <input type="tel" id="customer-phone" placeholder="+49 151 12345678" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Anmerkungen (optional)</label>
-                    <textarea id="customer-notes" rows="3" placeholder="Besondere Wünsche? z.B. Allergien"></textarea>
-                </div>
-
-                <div class="btn-group">
-                    <button class="btn btn-secondary" onclick="previousStep()">Zurück</button>
-                    <button class="btn btn-primary" onclick="nextStep()">Termin buchen</button>
-                </div>
-            </div>
-
-            <!-- Step 4: Confirmation -->
-            <div id="step4" class="booking-step" style="display: none;">
-                <div class="confirmation-card">
-                    <div class="success-icon">✓</div>
-                    <h2 class="confirmation-title">Termin gebucht!</h2>
-                    <p style="color: var(--text-light); margin-bottom: 20px;">
-                        Vielen Dank! Wir freuen uns auf deinen Besuch.
-                    </p>
-                    
-                    <div class="confirmation-details" id="confirmation-details"></div>
-
-                    <button class="btn btn-primary" onclick="downloadICS()">
-                        📅 Zum Kalender hinzufügen
-                    </button>
-                    <button class="btn btn-secondary" onclick="shareBooking()" style="margin-top: 12px;">
-                        📱 Teilen
-                    </button>
-                    <button class="btn btn-secondary" onclick="newBooking()" style="margin-top: 12px;">
-                        Neuer Termin
-                    </button>
-                </div>
-            </div>
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle>Öffnungszeiten</CardTitle>
+              <CardDescription>Aktuelle Sprech- und Servicezeiten</CardDescription>
+            </CardHeader>
+            <CardContent className="text-sm text-slate-600 grid gap-1">
+              <div>Mo–Mi: geschlossen</div>
+              <div>Do: 11:30–17:00</div>
+              <div>Fr: 11:30–17:00</div>
+              <div>Sa: 10:00–14:00</div>
+              <div>So/Feiertag: geschlossen</div>
+            </CardContent>
+          </Card>
         </div>
+      </section>
 
-        <!-- Admin Tab -->
-        <div id="admin-tab" class="screen" style="display: none;">
-            <!-- Admin Login -->
-            <div id="admin-login" class="admin-login">
-                <h2 style="margin-bottom: 20px; text-align: center;">Admin-Bereich</h2>
-                <div class="form-group">
-                    <label>PIN eingeben</label>
-                    <input type="password" id="admin-pin" placeholder="••••">
-                </div>
-                <button class="btn btn-primary" onclick="loginAdmin()">Anmelden</button>
-            </div>
-
-            <!-- Admin Dashboard -->
-            <div id="admin-dashboard" style="display: none;">
-                <div class="admin-header">
-                    <h2 class="admin-title">Admin Dashboard</h2>
-                    <button class="btn btn-small btn-edit" onclick="logoutAdmin()">Abmelden</button>
-                </div>
-
-                <!-- Stats Section -->
-                <div class="admin-section">
-                    <h3 class="admin-section-title">Mitarbeiterstatistiken</h3>
-                    <div class="stats-grid" id="stats-grid"></div>
-                </div>
-
-                <!-- Services Management -->
-                <div class="admin-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3 class="admin-section-title">Leistungen</h3>
-                        <button class="btn btn-small btn-primary" onclick="showServiceModal()">+ Neu</button>
-                    </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Dauer</th>
-                                <th>Preis</th>
-                                <th>Aktionen</th>
-                            </tr>
-                        </thead>
-                        <tbody id="services-table"></tbody>
-                    </table>
-                </div>
-
-                <!-- Employees Management -->
-                <div class="admin-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3 class="admin-section-title">Mitarbeiter</h3>
-                        <button class="btn btn-small btn-primary" onclick="showEmployeeModal()">+ Neu</button>
-                    </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Position</th>
-                                <th>Aktionen</th>
-                            </tr>
-                        </thead>
-                        <tbody id="employees-table"></tbody>
-                    </table>
-                </div>
-
-                <!-- Appointments -->
-                <div class="admin-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3 class="admin-section-title">Termine</h3>
-                        <button class="btn btn-small btn-edit" onclick="exportCSV()">CSV Export</button>
-                    </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Datum</th>
-                                <th>Zeit</th>
-                                <th>Kunde</th>
-                                <th>Leistung</th>
-                                <th>Mitarbeiter</th>
-                                <th>Status</th>
-                                <th>Aktionen</th>
-                            </tr>
-                        </thead>
-                        <tbody id="appointments-table"></tbody>
-                    </table>
-                </div>
-
-                <!-- Waitlist -->
-                <div class="admin-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3 class="admin-section-title">Warteliste</h3>
-                        <button class="btn btn-small btn-primary" onclick="clearWaitlist()">Leeren</button>
-                    </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Kunde</th>
-                                <th>Service</th>
-                                <th>Gewünschtes Datum</th>
-                                <th>Aktionen</th>
-                            </tr>
-                        </thead>
-                        <tbody id="waitlist-table"></tbody>
-                    </table>
-                </div>
-            </div>
+      {/* Bewertungen */}
+      <section id="bewertungen" className="max-w-6xl mx-auto px-4 py-10">
+        <h2 className="text-2xl md:text-3xl font-bold">Bewertungen</h2>
+        <div className="mt-2 inline-flex items-center gap-2 text-slate-700">
+          <span className="font-semibold">4.96/5</span>
+          <div aria-label="4.96 von 5 Sternen" className="text-amber-500">★★★★★</div>
+          <span className="text-xs text-slate-500">(aus jüngsten Google-Bewertungen)</span>
         </div>
+      </section>
+
+      {/* Kontakt */}
+      <section id="kontakt" className="max-w-6xl mx-auto px-4 py-10">
+        <h2 className="text-2xl md:text-3xl font-bold">Kontakt</h2>
+        <div className="mt-6 grid md:grid-cols-2 gap-4">
+          <Card className="rounded-2xl">
+            <CardHeader>
+              <CardTitle>Direkter Draht</CardTitle>
+              <CardDescription>Wir melden uns innerhalb eines Werktags.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-2 text-sm">
+              <a href="tel:+491783749554" className="inline-flex items-center gap-2 hover:underline">
+                <Phone className="size-4" /> 0178 3749554
+              </a>
+              <a href="mailto:hallo@beispiel.de" className="inline-flex items-center gap-2 hover:underline">
+                <Mail className="size-4" /> hallo@beispiel.de
+              </a>
+            </CardContent>
+          </Card>
+
+          <AdminPanel />
+        </div>
+      </section>
+
+      {/* Floating CTA (mobil) */}
+      <div className="fixed bottom-4 right-4 z-50 md:hidden flex flex-col gap-2">
+        <a href={BOOKING_URL} target="_blank" rel="noreferrer noopener" className="rounded-full shadow-lg bg-sky-600 text-white px-5 py-3 text-sm">Jetzt buchen</a>
+        <a href="tel:+491783749554" className="rounded-full shadow-lg bg-white border px-5 py-3 text-sm">Anrufen</a>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t">
+        <div className="max-w-6xl mx-auto px-4 py-8 text-sm text-slate-500 flex flex-col md:flex-row items-center justify-between gap-3">
+          <div>© {new Date().getFullYear()} Salontermin. Alle Rechte vorbehalten.</div>
+          <div className="flex items-center gap-4">
+            <a href="#" className="hover:underline">Impressum</a>
+            <a href="#" className="hover:underline">Datenschutz</a>
+          </div>
+        </div>
+      </footer>
+
+      {/* Admin Modal Trigger */}
+      <AdminDialog
+        open={adminOpen}
+        onOpenChange={setAdminOpen}
+        adminAuthenticated={adminAuthenticated}
+        setAdminAuthenticated={setAdminAuthenticated}
+        adminPwInput={adminPwInput}
+        setAdminPwInput={setAdminPwInput}
+        adminTab={adminTab}
+        setAdminTab={setAdminTab}
+        weekStart={weekStart}
+        setWeekStart={setWeekStart}
+        days={days}
+        isOpenAt={isOpenAt}
+        apptsOn={apptsOn}
+        serviceById={serviceById}
+        appointments={appointments}
+        setAppointments={setAppointments}
+        openCreate={openCreate}
+        createOpen={createOpen}
+        setCreateOpen={setCreateOpen}
+        createStep={createStep}
+        setCreateStep={setCreateStep}
+        draft={draft}
+        setDraft={setDraft}
+        defaultDateTimeForNew={defaultDateTimeForNew}
+      />
     </div>
+  );
+}
 
-    <!-- Modals -->
-    <div id="service-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Leistung hinzufügen</h3>
-                <button class="modal-close" onclick="closeModal('service-modal')">&times;</button>
-            </div>
-            <div class="form-group">
-                <label>Name</label>
-                <input type="text" id="service-name" placeholder="z.B. Maschinenhaarschnitt (Herren)">
-            </div>
-            <div class="form-group">
-                <label>Dauer (Minuten)</label>
-                <input type="number" id="service-duration" placeholder="20">
-            </div>
-            <div class="form-group">
-                <label>Puffer (Minuten)</label>
-                <input type="number" id="service-buffer" placeholder="15">
-            </div>
-            <div class="form-group">
-                <label>Preis (€)</label>
-                <input type="number" step="0.5" id="service-price" placeholder="11">
-            </div>
-            <button class="btn btn-primary" onclick="saveService()">Speichern</button>
-        </div>
-    </div>
+function AdminDialog(props){
+  const { open, onOpenChange, adminAuthenticated, setAdminAuthenticated, adminPwInput, setAdminPwInput, adminTab, setAdminTab, weekStart, setWeekStart, days, isOpenAt, apptsOn, serviceById, appointments, setAppointments, openCreate, createOpen, setCreateOpen, createStep, setCreateStep, draft, setDraft, defaultDateTimeForNew } = props;
 
-    <div id="employee-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Mitarbeiter hinzufügen</h3>
-                <button class="modal-close" onclick="closeModal('employee-modal')">&times;</button>
+  function shiftWeek(delta){ setWeekStart(addDays(weekStart, delta*7)); }
+
+  // Für „Neuer Termin“ Dialog im Termine-Tab
+  const [listCreateOpen, setListCreateOpen] = React.useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[1100px] max-h-[85vh] overflow-auto">
+        {!adminAuthenticated ? (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2"><Settings className="size-4"/> Admin-Login</DialogTitle>
+              <DialogDescription>Bitte Passwort eingeben, um das Dashboard zu öffnen.</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={(e)=>{e.preventDefault(); const ok = (window.__SALON_ADMIN_PW ?? "SALON-ADMIN-1234") === adminPwInput; if(ok){ setAdminAuthenticated(true); try{ localStorage.setItem('salon_admin_ok','1'); }catch(_){} } else { alert('Falsches Passwort'); }}} className="grid gap-3">
+              <div>
+                <Label htmlFor="adminpw">Passwort</Label>
+                <Input id="adminpw" type="password" className="rounded-2xl" value={adminPwInput} onChange={(e)=>setAdminPwInput(e.target.value)} placeholder="••••••••" required />
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit" className="rounded-2xl">Einloggen</Button>
+                <Button type="button" variant="outline" className="rounded-2xl" onClick={()=>onOpenChange(false)}>Abbrechen</Button>
+              </div>
+              <div className="text-xs text-slate-500">Hinweis: Clientseitiger Demo-Schutz – für echte Sicherheit bitte serverseitige Auth verwenden.</div>
+            </form>
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2"><Settings className="size-4"/> Admin-Dashboard</DialogTitle>
+              <DialogDescription>Wochenkalender, Termine, Services & Einstellungen.</DialogDescription>
+            </DialogHeader>
+
+            {/* Tabs */}
+            <div className="flex items-center gap-2 text-sm">
+              {["kalender","termine","services","einstellungen"].map((key)=> (
+                <button key={key} onClick={()=>setAdminTab(key)} className={`px-3 py-2 rounded-xl border ${adminTab===key? 'bg-slate-900 text-white' : 'bg-white hover:bg-slate-50'}`}>{key[0].toUpperCase()+key.slice(1)}</button>
+              ))}
+              <div className="ml-auto">
+                <Button variant="outline" className="rounded-2xl" onClick={()=>{ setAdminAuthenticated(false); try{ localStorage.removeItem('salon_admin_ok'); }catch(_){} setAdminPwInput(''); }}>Logout</Button>
+              </div>
             </div>
-            <div class="form-group">
-                <label>Name</label>
-                <input type="text" id="employee-name" placeholder="z.B. Anna Müller">
-            </div>
-            <div class="form-group">
-                <label>Position</label>
-                <input type="text" id="employee-position" placeholder="z.B. Stylistin">
-            </div>
-            <button class="btn btn-primary" onclick="saveEmployee()">Speichern</button>
-        </div>
-    </div>
 
-    <div id="waitlist-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Zur Warteliste hinzufügen</h3>
-                <button class="modal-close" onclick="closeModal('waitlist-modal')">&times;</button>
-            </div>
-            <div class="form-group">
-                <label>E-Mail *</label>
-                <input type="email" id="waitlist-email" placeholder="max@beispiel.de" required>
-            </div>
-            <div class="form-group">
-                <label>Gewünschtes Datum</label>
-                <input type="date" id="waitlist-date" required>
-            </div>
-            <button class="btn btn-warning" onclick="addToWaitlist()">Hinzufügen</button>
-        </div>
-    </div>
+            {/* Kalender Tab */}
+            {adminTab === 'kalender' && (
+              <div className="mt-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-sm text-slate-600">Woche ab <strong>{toISODate(weekStart)}</strong></div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" className="rounded-2xl" onClick={()=>shiftWeek(-1)}>Vorherige Woche</Button>
+                    <Button className="rounded-2xl" onClick={()=>setWeekStart(getWeekStart(new Date()))}>Heute</Button>
+                    <Button variant="outline" className="rounded-2xl" onClick={()=>shiftWeek(1)}>Nächste Woche</Button>
+                  </div>
+                </div>
 
-    <script>
-        // Data Storage
-        const ADMIN_PIN = '1234'; // Ändere das!
-        let currentStep = 1;
-        let selectedService = null;
-        let selectedEmployee = null;
-        let selectedDate = null;
-        let selectedTime = null;
-        let customerData = {};
-
-        // Initialize data with full services
-        if (!localStorage.getItem('salonData')) {
-            const initialData = {
-                services: [
-                    { id: 1, name: 'Maschinenhaarschnitt (Herren)', duration: 20, buffer: 15, price: 11 },
-                    { id: 2, name: 'Trockenschnitt (Herren)', duration: 25, buffer: 15, price: 15 },
-                    { id: 3, name: 'Waschen, Schneiden (Herren)', duration: 30, buffer: 15, price: 17 },
-                    { id: 4, name: 'Waschen, Schneiden, Föhnen (Herren)', duration: 35, buffer: 15, price: 19.5 },
-                    { id: 5, name: 'Trockenschnitt (Damen)', duration: 30, buffer: 15, price: 19 },
-                    { id: 6, name: 'Waschen, Schneiden (Damen)', duration: 35, buffer: 15, price: 21 },
-                    { id: 7, name: 'Waschen, Schneiden, Föhnen (kurz)', duration: 45, buffer: 15, price: 23 },
-                    { id: 8, name: 'Waschen, Schneiden, Föhnen (mittel)', duration: 60, buffer: 15, price: 28 },
-                    { id: 9, name: 'Waschen, Schneiden, Föhnen (lang)', duration: 90, buffer: 15, price: 33 },
-                    { id: 10, name: 'Ansatzfarbe', duration: 90, buffer: 15, price: 43 },
-                    { id: 11, name: 'Foliensträhnen XS (bis 15)', duration: 60, buffer: 15, price: 29 },
-                    { id: 12, name: 'Foliensträhnen S (halber Kopf)', duration: 90, buffer: 15, price: 49 },
-                    { id: 13, name: 'Foliensträhnen M (ganzer Kopf)', duration: 120, buffer: 15, price: 69 },
-                    { id: 14, name: 'Tönung', duration: 60, buffer: 15, price: 35 },
-                    { id: 15, name: 'Glossing', duration: 20, buffer: 15, price: 15 },
-                    { id: 16, name: 'Conditioner / Pflege', duration: 10, buffer: 15, price: 5 }
-                ],
-                employees: [
-                    { id: 1, name: 'Anna Müller', position: 'Stylistin', avatar: '👩‍🦰' },
-                    { id: 2, name: 'Max Schmidt', position: 'Stylist', avatar: '👨‍🦱' },
-                    { id: 3, name: 'Lisa Berger', position: 'Senior Stylistin', avatar: '👩‍🦳' }
-                ],
-                appointments: [],
-                waitlist: []
-            };
-            localStorage.setItem('salonData', JSON.stringify(initialData));
-        }
-
-        // Helper Functions
-        function getData() {
-            return JSON.parse(localStorage.getItem('salonData'));
-        }
-
-        function saveData(data) {
-            localStorage.setItem('salonData', JSON.stringify(data));
-        }
-
-        // Tab Switching
-        function switchTab(tab) {
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            
-            if (tab === 'booking') {
-                document.querySelector('.nav-tab:nth-child(1)').classList.add('active');
-                document.getElementById('booking-tab').classList.add('active');
-                currentStep = 1;
-                updateProgressBar();
-                loadServices();
-            } else if (tab === 'admin') {
-                document.querySelector('.nav-tab:nth-child(2)').classList.add('active');
-                document.getElementById('admin-tab').classList.add('active');
-            }
-        }
-
-        // Booking Flow
-        function loadServices() {
-            const data = getData();
-            const container = document.getElementById('services-list');
-            container.innerHTML = '';
-            
-            data.services.forEach(service => {
-                container.innerHTML += `
-                    <div class="service-card ${selectedService?.id === service.id ? 'selected' : ''}" 
-                         onclick="selectService(${service.id})">
-                        <div class="service-name">${service.name}</div>
-                        <div class="service-info">
-                            <span>⏱ ${service.duration} Min.</span>
-                            <span class="service-price">${service.price}€</span>
+                <div className="overflow-auto rounded-2xl border max-h-[70vh]">
+                  <div className="min-w-[900px]">
+                    {/* Header row */}
+                    <div className="grid" style={{gridTemplateColumns:`100px repeat(7, 1fr)`}}>
+                      <div className="bg-slate-50 border-b p-2 text-xs text-slate-500 sticky top-0 z-20">Zeit</div>
+                      {days.map((d,i)=> (
+                        <div key={i} className="bg-slate-50 border-b p-2 text-xs text-slate-600 sticky top-0 z-10">
+                          {d.toLocaleDateString('de-DE', { weekday:'short', day:'2-digit', month:'2-digit'})}
+                          {isOpenAt(d) ? null : <span className="ml-2 text-[10px] text-slate-400">geschlossen</span>}
                         </div>
+                      ))}
                     </div>
-                `;
-            });
-        }
-
-        function selectService(id) {
-            const data = getData();
-            selectedService = data.services.find(s => s.id === id);
-            loadServices();
-        }
-
-        function loadEmployees() {
-            const data = getData();
-            const container = document.getElementById('employee-list');
-            container.innerHTML = '';
-            
-            data.employees.forEach(employee => {
-                container.innerHTML += `
-                    <div class="employee-card ${selectedEmployee?.id === employee.id ? 'selected' : ''}" 
-                         onclick="selectEmployee(${employee.id})">
-                        <div class="employee-avatar">${employee.avatar}</div>
-                        <div class="employee-name">${employee.name}</div>
-                    </div>
-                `;
-            });
-        }
-
-        function selectEmployee(id) {
-            const data = getData();
-            selectedEmployee = data.employees.find(e => e.id === id);
-            loadEmployees();
-            loadTimeSlots();
-        }
-
-        function loadDates() {
-            const container = document.getElementById('date-chips');
-            container.innerHTML = '';
-            
-            const daysOfWeek = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-            const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
-            
-            // Next 28 days, only Thu/Fri/Sat (as per your example)
-            const dates = [];
-            const today = new Date('2025-10-03'); // Current date
-            
-            for (let i = 0; i < 28; i++) {
-                const date = new Date(today);
-                date.setDate(today.getDate() + i);
-                const dayOfWeek = date.getDay();
-                
-                if (dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6) { // Thu=4, Fri=5, Sat=6
-                    dates.push(date);
-                }
-            }
-            
-            dates.forEach(date => {
-                const dateStr = date.toISOString().split('T')[0];
-                container.innerHTML += `
-                    <div class="date-chip ${selectedDate === dateStr ? 'selected' : ''}" 
-                         onclick="selectDate('${dateStr}')">
-                        <div class="date-day">${daysOfWeek[date.getDay()]}</div>
-                        <div class="date-date">${date.getDate()}.${months[date.getMonth()]}</div>
-                    </div>
-                `;
-            });
-        }
-
-        function selectDate(dateStr) {
-            selectedDate = dateStr;
-            loadDates();
-            loadTimeSlots();
-        }
-
-        function loadTimeSlots() {
-            const container = document.getElementById('time-slots');
-            container.innerHTML = '';
-            
-            if (!selectedDate || !selectedEmployee) {
-                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-light);">Bitte wähle erst Mitarbeiter und Datum</p>';
-                return;
-            }
-            
-            const data = getData();
-            const dayOfWeek = new Date(selectedDate).getDay();
-            
-            // Opening hours (Thu/Fri/Sat)
-            const hours = {
-                4: { start: 10, end: 18 }, // Thursday
-                5: { start: 9, end: 19 },  // Friday
-                6: { start: 9, end: 16 }   // Saturday
-            };
-            
-            const dayHours = hours[dayOfWeek] || { start: 9, end: 18 };
-            const slots = [];
-            
-            // Generate 30-min slots
-            for (let hour = dayHours.start; hour < dayHours.end; hour++) {
-                slots.push(`${hour.toString().padStart(2, '0')}:00`);
-                if (hour < dayHours.end - 1) slots.push(`${hour.toString().padStart(2, '0')}:30`);
-            }
-            
-            // Booked slots (with buffer check)
-            const bookedSlots = data.appointments
-                .filter(apt => apt.date === selectedDate && apt.employeeId === selectedEmployee.id)
-                .map(apt => {
-                    const start = new Date(`${apt.date}T${apt.time}:00`);
-                    const end = new Date(start.getTime() + (apt.duration + apt.buffer) * 60000);
-                    return { start: start.toTimeString().slice(0,5), end: end.toTimeString().slice(0,5) };
-                });
-            
-            slots.forEach(slot => {
-                const isBooked = bookedSlots.some(b => {
-                    const slotTime = new Date(`${selectedDate}T${slot}:00`).getTime();
-                    const bStart = new Date(`${selectedDate}T${b.start}:00`).getTime();
-                    const bEnd = new Date(`${selectedDate}T${b.end}:00`).getTime();
-                    return slotTime >= bStart && slotTime < bEnd;
-                });
-                const slotHtml = isBooked ? 
-                    `<div class="time-slot disabled">${slot}<br><button class="waitlist-btn" onclick="showWaitlistModal('${slot}')">Warteliste</button></div>` :
-                    `<div class="time-slot ${selectedTime === slot ? 'selected' : ''}" onclick="selectTime('${slot}')">${slot}</div>`;
-                container.innerHTML += slotHtml;
-            });
-        }
-
-        function showWaitlistModal(slot) {
-            document.getElementById('waitlist-date').value = selectedDate;
-            document.getElementById('waitlist-modal').classList.add('show');
-        }
-
-        function addToWaitlist() {
-            const email = document.getElementById('waitlist-email').value;
-            const date = document.getElementById('waitlist-date').value;
-            if (!email || !date) return alert('E-Mail und Datum erforderlich');
-            
-            const data = getData();
-            data.waitlist.push({
-                id: Date.now(),
-                serviceId: selectedService.id,
-                serviceName: selectedService.name,
-                employeeId: selectedEmployee.id,
-                email,
-                date,
-                createdAt: new Date().toISOString()
-            });
-            saveData(data);
-            closeModal('waitlist-modal');
-            alert('Zur Warteliste hinzugefügt!');
-            loadTimeSlots(); // Refresh
-        }
-
-        function selectTime(time) {
-            selectedTime = time;
-            loadTimeSlots();
-        }
-
-        function nextStep() {
-            if (currentStep === 1 && !selectedService) return alert('Bitte wähle eine Leistung aus');
-            if (currentStep === 2) {
-                if (!selectedEmployee || !selectedDate || !selectedTime) return alert('Bitte wähle Mitarbeiter, Datum und Zeit aus');
-            }
-            if (currentStep === 3) {
-                const name = document.getElementById('customer-name').value.trim();
-                const email = document.getElementById('customer-email').value.trim();
-                const phone = document.getElementById('customer-phone').value.trim();
-                const notes = document.getElementById('customer-notes').value.trim();
-                
-                if (!name || !email || !phone) return alert('Bitte fülle alle Pflichtfelder aus');
-                if (!email.includes('@')) return alert('Ungültige E-Mail');
-                
-                customerData = { name, email, phone, notes };
-                
-                // Save appointment
-                const data = getData();
-                const appointment = {
-                    id: Date.now(),
-                    serviceId: selectedService.id,
-                    serviceName: selectedService.name,
-                    duration: selectedService.duration,
-                    buffer: selectedService.buffer,
-                    employeeId: selectedEmployee.id,
-                    employeeName: selectedEmployee.name,
-                    date: selectedDate,
-                    time: selectedTime,
-                    customer: customerData,
-                    price: selectedService.price,
-                    status: 'confirmed',
-                    createdAt: new Date().toISOString()
-                };
-                
-                data.appointments.push(appointment);
-                saveData(data);
-                
-                showConfirmation(appointment);
-            }
-            
-            if (currentStep < 4) {
-                document.getElementById(`step${currentStep}`).style.display = 'none';
-                currentStep++;
-                document.getElementById(`step${currentStep}`).style.display = 'block';
-                updateProgressBar();
-            }
-            
-            if (currentStep === 2) {
-                loadEmployees();
-                loadDates();
-            }
-        }
-
-        function previousStep() {
-            if (currentStep > 1) {
-                document.getElementById(`step${currentStep}`).style.display = 'none';
-                currentStep--;
-                document.getElementById(`step${currentStep}`).style.display = 'block';
-                updateProgressBar();
-            }
-        }
-
-        function updateProgressBar() {
-            const steps = document.querySelectorAll('.progress-step');
-            steps.forEach((step, index) => {
-                step.classList.remove('active', 'completed');
-                if (index < currentStep - 1) {
-                    step.classList.add('completed');
-                } else if (index === currentStep - 1) {
-                    step.classList.add('active');
-                }
-            });
-        }
-
-        function showConfirmation(appointment) {
-            const details = document.getElementById('confirmation-details');
-            const dateObj = new Date(appointment.date);
-            const dateStr = dateObj.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' });
-            
-            details.innerHTML = `
-                <div class="detail-row">
-                    <span class="detail-label">Leistung</span>
-                    <span class="detail-value">${appointment.serviceName}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Mitarbeiter</span>
-                    <span class="detail-value">${appointment.employeeName}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Datum</span>
-                    <span class="detail-value">${dateStr}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Uhrzeit</span>
-                    <span class="detail-value">${appointment.time} Uhr</span>
-                </div>
-                <div class="detail-row">
-                    <span class="detail-label">Preis</span>
-                    <span class="detail-value">${appointment.price}€</span>
-                </div>
-            `;
-        }
-
-        function newBooking() {
-            currentStep = 1;
-            selectedService = null;
-            selectedEmployee = null;
-            selectedDate = null;
-            selectedTime = null;
-            customerData = {};
-            document.querySelectorAll('input, textarea').forEach(el => el.value = '');
-            
-            document.getElementById('step4').style.display = 'none';
-            document.getElementById('step1').style.display = 'block';
-            updateProgressBar();
-            loadServices();
-        }
-
-        function downloadICS() {
-            // Simple ICS generation
-            const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:Termin bei Hair Studio\nDTSTART:${selectedDate.replace(/-/g,'')}T${selectedTime.replace(':', '')}00\nDTEND:${selectedDate.replace(/-/g,'')}T${(parseInt(selectedTime.split(':')[0]) + 1).toString().padStart(2,'0')}${selectedTime.split(':')[1]}00\nDESCRIPTION:${selectedService.name} mit ${selectedEmployee.name}\nEND:VEVENT\nEND:VCALENDAR`;
-            const blob = new Blob([ics], { type: 'text/calendar' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'termin.ics';
-            a.click();
-        }
-
-        function shareBooking() {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Mein Termin bei Hair Studio',
-                    text: `Termin: ${selectedService.name} am ${selectedDate} um ${selectedTime}`,
-                    url: window.location.href
-                });
-            } else {
-                prompt('Kopiere diesen Text zum Teilen:', `Termin gebucht: ${selectedService.name} am ${selectedDate} um ${selectedTime} Uhr`);
-            }
-        }
-
-        // Admin Functions
-        function loginAdmin() {
-            const pin = document.getElementById('admin-pin').value;
-            if (pin === ADMIN_PIN) {
-                document.getElementById('admin-login').style.display = 'none';
-                document.getElementById('admin-dashboard').style.display = 'block';
-                loadAdminData();
-            } else {
-                alert('Falscher PIN!');
-            }
-        }
-
-        function logoutAdmin() {
-            document.getElementById('admin-dashboard').style.display = 'none';
-            document.getElementById('admin-login').style.display = 'block';
-            document.getElementById('admin-pin').value = '';
-        }
-
-        function loadAdminData() {
-            const data = getData();
-            
-            // Load stats
-            loadStats(data);
-
-            // Load services
-            const servicesTable = document.getElementById('services-table');
-            servicesTable.innerHTML = '';
-            data.services.forEach(service => {
-                servicesTable.innerHTML += `
-                    <tr>
-                        <td>${service.name}</td>
-                        <td>${service.duration} Min.</td>
-                        <td>${service.price}€</td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn-small btn-edit" onclick="editService(${service.id})">Bearbeiten</button>
-                                <button class="btn-small btn-delete" onclick="deleteService(${service.id})">Löschen</button>
+                    {/* Time rows */}
+                    {Array.from({length: 48}, (_,r)=> r*30).map((tMin, ri)=> (
+                      <div key={ri} className="grid" style={{gridTemplateColumns:`100px repeat(7, 1fr)`}}>
+                        <div className="border-t p-2 text-[11px] text-slate-500 sticky left-0 bg-white z-10">{fmtHM(tMin)}</div>
+                        {days.map((d,ci)=> {
+                          const conf = isOpenAt(d);
+                          const tStr = fmtHM(tMin);
+                          const open = !!conf && parseTime(tStr) >= parseTime(conf.start) && parseTime(tStr) < parseTime(conf.end);
+                          const dateStr = toISODate(d);
+                          const items = apptsOn(dateStr).filter(a=>a.time===tStr);
+                          return (
+                            <div key={ci} className={`border-t border-l p-1 min-h-[28px] ${open? 'bg-white' : 'bg-slate-50/60'}`}>
+                              {items.map(a=>{
+                                const s = serviceById(a.serviceId);
+                                return (
+                                  <div key={a.id} className="text-[11px] rounded-lg border px-2 py-1 mb-1 bg-emerald-50 border-emerald-200">
+                                    <div className="font-medium truncate">{a.name} • {s? s.name : 'Service'} ({a.stylist})</div>
+                                    <div className="text-slate-700">{tStr} – {addMinutes(tStr, a.duration || (s? s.dauer:0))} • {a.status}</div>
+                                  </div>
+                                );
+                              })}
+                              {items.length===0 && (
+                                <button className="w-full h-full text-[11px] text-slate-400 hover:text-slate-700" onClick={()=>openCreate(dateStr, tStr)}>
+                                  <Plus className="inline size-3 mr-1"/> Termin
+                                </button>
+                              )}
                             </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            // Load employees
-            const employeesTable = document.getElementById('employees-table');
-            employeesTable.innerHTML = '';
-            data.employees.forEach(employee => {
-                employeesTable.innerHTML += `
-                    <tr>
-                        <td>${employee.name}</td>
-                        <td>${employee.position}</td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn-small btn-edit" onclick="editEmployee(${employee.id})">Bearbeiten</button>
-                                <button class="btn-small btn-delete" onclick="deleteEmployee(${employee.id})">Löschen</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            // Load appointments
-            const appointmentsTable = document.getElementById('appointments-table');
-            appointmentsTable.innerHTML = '';
-            const sortedAppointments = data.appointments.sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
-            sortedAppointments.forEach(apt => {
-                const dateObj = new Date(apt.date);
-                const dateStr = dateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
-                
-                appointmentsTable.innerHTML += `
-                    <tr>
-                        <td>${dateStr}</td>
-                        <td>${apt.time}</td>
-                        <td>${apt.customer.name}</td>
-                        <td>${apt.serviceName}</td>
-                        <td>${apt.employeeName}</td>
-                        <td><span class="badge ${apt.status === 'confirmed' ? 'badge-success' : 'badge-pending'}">${apt.status}</span></td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn-small btn-invoice" onclick="generateInvoice(${apt.id})">Rechnung</button>
-                                <button class="btn-small btn-delete" onclick="cancelAppointment(${apt.id})">Stornieren</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-            // Load waitlist
-            const waitlistTable = document.getElementById('waitlist-table');
-            waitlistTable.innerHTML = '';
-            data.waitlist.forEach(item => {
-                const dateObj = new Date(item.date);
-                const dateStr = dateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' });
-                
-                waitlistTable.innerHTML += `
-                    <tr>
-                        <td>${item.email}</td>
-                        <td>${item.serviceName}</td>
-                        <td>${dateStr}</td>
-                        <td>
-                            <div class="action-btns">
-                                <button class="btn-small btn-primary" onclick="moveToAppointment(${item.id})">Zu Termin</button>
-                                <button class="btn-small btn-delete" onclick="deleteWaitlist(${item.id})">Löschen</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
+                {/* Create dialog from calendar */}
+                <CreateAppointmentDialog
+                  open={createOpen}
+                  onOpenChange={(v)=>{ setCreateOpen(v); if(!v) setCreateStep('form'); }}
+                  step={createStep}
+                  setStep={setCreateStep}
+                  draft={draft}
+                  setDraft={setDraft}
+                  appointments={appointments}
+                  onSave={(appt)=> setAppointments([appt, ...appointments])}
+                  allowAnyTime={true}
+                />
+              </div>
+            )}
 
-        function loadStats(data) {
-            const grid = document.getElementById('stats-grid');
-            grid.innerHTML = '';
-            
-            data.employees.forEach(emp => {
-                const empApps = data.appointments.filter(a => a.employeeId === emp.id);
-                const total = empApps.length;
-                const revenue = empApps.reduce((sum, a) => sum + a.price, 0);
-                const cancelRate = ((empApps.filter(a => a.status !== 'confirmed').length / total) * 100).toFixed(1);
-                
-                grid.innerHTML += `
-                    <div class="stat-card">
-                        <div class="stat-value">${total}</div>
-                        <div class="stat-label">${emp.name} Termine</div>
-                        <div style="font-size: 12px; margin-top: 4px;">Umsatz: ${revenue}€ | Cancel: ${cancelRate}%</div>
-                    </div>
-                `;
-            });
-        }
+            {/* Services Tab */}
+            {adminTab === 'services' && (
+              <div className="mt-4 grid gap-3 text-sm">
+                <div className="text-slate-600">Dienstleistungen (aus Datei geladen):</div>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {SERVICES.map((s)=> (
+                    <Card key={s.id} className="rounded-2xl">
+                      <CardHeader>
+                        <CardTitle className="text-base">{s.name}</CardTitle>
+                        <CardDescription>{s.preis} • {s.dauer} Min</CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex gap-2">
+                        <Button size="sm" className="rounded-xl"><Edit className="size-4 mr-1"/> Bearbeiten</Button>
+                        <Button size="sm" variant="outline" className="rounded-xl"><Trash2 className="size-4 mr-1"/> Entfernen</Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
 
-        function showServiceModal(editId = null) {
-            // Edit mode if id provided
-            if (editId) {
-                const data = getData();
-                const service = data.services.find(s => s.id === editId);
-                if (service) {
-                    document.getElementById('service-name').value = service.name;
-                    document.getElementById('service-duration').value = service.duration;
-                    document.getElementById('service-buffer').value = service.buffer;
-                    document.getElementById('service-price').value = service.price;
-                    document.querySelector('#service-modal .modal-title').textContent = 'Leistung bearbeiten';
-                }
-            } else {
-                document.querySelector('#service-modal .modal-title').textContent = 'Leistung hinzufügen';
-                // Clear form
-                ['service-name', 'service-duration', 'service-buffer', 'service-price'].forEach(id => document.getElementById(id).value = '');
-            }
-            document.getElementById('service-modal').classList.add('show');
-        }
+            {/* Einstellungen Tab */}
+            {adminTab === 'einstellungen' && (
+              <div className="mt-4 grid gap-4">
+                <Card className="rounded-2xl">
+                  <CardHeader>
+                    <CardTitle>Öffnungszeiten</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid md:grid-cols-3 gap-2 text-sm">
+                    <div>Do: 11:30–17:00</div>
+                    <div>Fr: 11:30–17:00</div>
+                    <div>Sa: 10:00–14:00</div>
+                  </CardContent>
+                </Card>
+                <Card className="rounded-2xl">
+                  <CardHeader>
+                    <CardTitle>Abwesenheiten/Schließtage</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid gap-2 text-sm">
+                    <div>Bis 24.10.2025: ausgebucht</div>
+                    <div>Ab 25.10.2025: Termine verfügbar</div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
 
-        function editService(id) {
-            showServiceModal(id);
-        }
+function CreateAppointmentDialog({ open, onOpenChange, step, setStep, draft, setDraft, appointments, onSave, allowAnyTime = false }){
+  const [stepMins, setStepMins] = React.useState(10); // 5/10/15/30
+  const [useEndTime, setUseEndTime] = React.useState(false);
 
-        function saveService() {
-            const name = document.getElementById('service-name').value.trim();
-            const duration = parseInt(document.getElementById('service-duration').value);
-            const buffer = parseInt(document.getElementById('service-buffer').value);
-            const price = parseFloat(document.getElementById('service-price').value);
-            
-            if (!name || !duration || !price) return alert('Alle Felder erforderlich');
-            
-            const data = getData();
-            const editId = Date.now(); // Temp for new
-            const service = {
-                id: editId,
-                name,
-                duration,
-                buffer,
-                price
-            };
-            
-            // Check if editing (use existing id if passed, but since modal doesn't pass, assume new for simplicity; extend if needed
-            data.services.push(service);
-            saveData(data);
-            loadAdminData();
-            closeModal('service-modal');
-        }
+  function isOpen(dateStr){ const d=new Date(dateStr); return !!OPENING[d.getDay()]; }
+  function freeTimesAllDay(dateStr){
+    if(!dateStr) return [];
+    const out=[]; for(let t=0; t<24*60; t+=stepMins) out.push(fmtHM(t));
+    const taken = new Set(appointments.filter(a=>a.date===dateStr).map(a=>a.time));
+    return out.filter(t=>!taken.has(t));
+  }
+  function freeTimesOpening(dateStr){
+    if(!dateStr) return [];
+    const conf = OPENING[new Date(dateStr).getDay()];
+    if(!conf) return [];
+    const out=[]; for(let t=parseTime(conf.start); t<parseTime(conf.end); t+=stepMins) out.push(fmtHM(t));
+    const taken = new Set(appointments.filter(a=>a.date===dateStr).map(a=>a.time));
+    return out.filter(t=>!taken.has(t));
+  }
+  const options = (allowAnyTime? freeTimesAllDay : freeTimesOpening)(draft.date);
 
-        // Similar for employees...
-        function showEmployeeModal(editId = null) {
-            if (editId) {
-                const data = getData();
-                const emp = data.employees.find(e => e.id === editId);
-                if (emp) {
-                    document.getElementById('employee-name').value = emp.name;
-                    document.getElementById('employee-position').value = emp.position;
-                    document.querySelector('#employee-modal .modal-title').textContent = 'Mitarbeiter bearbeiten';
-                }
-            } else {
-                document.querySelector('#employee-modal .modal-title').textContent = 'Mitarbeiter hinzufügen';
-                document.getElementById('employee-name').value = '';
-                document.getElementById('employee-position').value = '';
-            }
-            document.getElementById('employee-modal').classList.add('show');
-        }
+  const hasOverlap = draft.date && draft.time && appointments.some(a=> a.date===draft.date && overlap(draft.time, Number(draft.duration||0)||serviceDur(draft.serviceId), a.time, a.duration || serviceDur(a.serviceId)) );
 
-        function editEmployee(id) {
-            showEmployeeModal(id);
-        }
+  function handleSave(){
+    if(!draft.name || !draft.date || !draft.time){ alert("Bitte Name, Datum und Uhrzeit angeben."); return; }
+    const dur = Number(draft.duration)||serviceDur(draft.serviceId);
+    if(dur <= 0){ alert("Bitte eine gültige Dauer angeben."); return; }
+    if(hasOverlap){ alert("Konflikt: Überschneidung mit bestehendem Termin."); return; }
+    const id = Math.floor(Math.random()*1e6);
+    const appt = { id, date: draft.date, time: draft.time, name: draft.name.trim(), serviceId: Number(draft.serviceId), stylist: draft.stylist||"Kevin", status: "neu", duration: dur };
+    onSave(appt);
+    setStep("success");
+  }
+  function resetAndClose(){ setStep("form"); onOpenChange(false); }
+  const endTime = draft.time && (Number(draft.duration)||serviceDur(draft.serviceId)) ? addMinutes(draft.time, Number(draft.duration)||serviceDur(draft.serviceId)) : "";
 
-        function saveEmployee() {
-            const name = document.getElementById('employee-name').value.trim();
-            const position = document.getElementById('employee-position').value.trim();
-            
-            if (!name) return alert('Name erforderlich');
-            
-            const data = getData();
-            const employee = {
-                id: Date.now(),
-                name,
-                position,
-                avatar: '👤' // Default
-            };
-            
-            data.employees.push(employee);
-            saveData(data);
-            loadAdminData();
-            closeModal('employee-modal');
-        }
+  return (
+    <Dialog open={open} onOpenChange={resetAndClose}>
+      <DialogContent className="sm:max-w-md">
+        {step === 'form' ? (
+          <>
+            <DialogHeader>
+              <DialogTitle>Termin anlegen</DialogTitle>
+              <DialogDescription>Startzeit auswählen (oder tippen), dann Dauer oder Endzeit.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3">
+              <div>
+                <Label htmlFor="name">Kund:in</Label>
+                <Input id="name" value={draft.name} onChange={(e)=>setDraft({...draft, name:e.target.value})} className="rounded-2xl" placeholder="Name" />
+              </div>
+              <div className="grid md:grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="date">Datum</Label>
+                  <Input id="date" type="date" className="rounded-2xl" value={draft.date} onChange={(e)=> setDraft({...draft, date: e.target.value, time: ''})} />
+                </div>
+                <div>
+                  <Label>Zeit-Raster</Label>
+                  <Select value={String(stepMins)} onValueChange={(v)=> setStepMins(Number(v))}>
+                    <SelectTrigger className="rounded-2xl"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {[5,10,15,30].map(v=> <SelectItem key={v} value={String(v)}>{v} Minuten</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 gap-3">
+                <div>
+                  <Label>Startzeit</Label>
+                  <div className="flex gap-2">
+                    <Select value={draft.time} onValueChange={(v)=> setDraft({...draft, time:v})}>
+                      <SelectTrigger className="rounded-2xl"><SelectValue placeholder={draft.date? (options.length? 'Uhrzeit wählen' : 'Keine freien Zeiten') : 'Erst Datum wählen'} /></SelectTrigger>
+                      <SelectContent>
+                        {options.map(t=> <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <Input type="time" step={stepMins*60} value={draft.time} onChange={(e)=> setDraft({...draft, time:e.target.value})} className="rounded-2xl" />
+                  </div>
+                </div>
+                <div>
+                  <Label>Endzeit statt Dauer?</Label>
+                  <div className="flex items-center gap-2 text-sm">
+                    <input id="useEnd" type="checkbox" checked={useEndTime} onChange={(e)=> setUseEndTime(e.target.checked)} />
+                    <label htmlFor="useEnd">Ich gebe eine Endzeit ein</label>
+                  </div>
+                </div>
+              </div>
 
-        function deleteService(id) {
-            if (confirm('Leistung wirklich löschen?')) {
-                const data = getData();
-                data.services = data.services.filter(s => s.id !== id);
-                saveData(data);
-                loadAdminData();
-            }
-        }
+              {!useEndTime ? (
+                <div>
+                  <Label htmlFor="duration">Dauer (Minuten)</Label>
+                  <Input id="duration" type="number" min={5} step={5} value={draft.duration ?? ''} onChange={(e)=> setDraft({...draft, duration: Number(e.target.value)||0})} className="rounded-2xl" placeholder="z. B. 35" />
+                  {draft.time && (draft.duration>0) && <div className="text-xs text-slate-500 mt-1">Ende: <strong>{endTime}</strong></div>}
+                </div>
+              ) : (
+                <div>
+                  <Label htmlFor="end">Endzeit</Label>
+                  <Input id="end" type="time" step={stepMins*60} value={endTime} onChange={(e)=> {
+                    if(!draft.time) return;
+                    const d = toMinutes(e.target.value) - toMinutes(draft.time);
+                    setDraft({...draft, duration: Math.max(5, d)});
+                  }} className="rounded-2xl" />
+                </div>
+              )}
 
-        function deleteEmployee(id) {
-            if (confirm('Mitarbeiter wirklich löschen?')) {
-                const data = getData();
-                data.employees = data.employees.filter(e => e.id !== id);
-                saveData(data);
-                loadAdminData();
-            }
-        }
+              <div>
+                <Label htmlFor="service">Dienstleistung</Label>
+                <Select value={String(draft.serviceId)} onValueChange={(v)=> setDraft({...draft, serviceId: Number(v), duration: serviceDur(v)})}>
+                  <SelectTrigger className="rounded-2xl"><SelectValue placeholder="Service wählen" /></SelectTrigger>
+                  <SelectContent>
+                    {SERVICES.map(s=> (
+                      <SelectItem key={s.id} value={String(s.id)}>{s.name} – {s.preis} • {s.dauer} Min</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="stylist">Stylist:in</Label>
+                <Input id="stylist" value={draft.stylist} onChange={(e)=>setDraft({...draft, stylist:e.target.value})} className="rounded-2xl" placeholder="z. B. Kevin" />
+              </div>
+              {hasOverlap && <div className="text-sm text-rose-600">Achtung: Überschneidung mit bestehendem Termin.</div>}
+              <div className="flex gap-2 pt-1">
+                <Button className="rounded-2xl" onClick={handleSave} disabled={!draft.name || !draft.date || !draft.time}>Speichern</Button>
+                <Button variant="outline" className="rounded-2xl" onClick={resetAndClose}>Abbrechen</Button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <DialogHeader>
+              <DialogTitle>Termin gebucht</DialogTitle>
+              <DialogDescription>Der Termin wurde gespeichert und erscheint im Kalender.</DialogDescription>
+            </DialogHeader>
+            <div className="rounded-xl border p-4 text-sm bg-emerald-50 text-emerald-900">
+              <div><strong>{draft.name}</strong> – {SERVICES.find(s=>s.id===Number(draft.serviceId))?.name}</div>
+              <div>{draft.date} • {draft.time} – {endTime} • Stylist: {draft.stylist}</div>
+            </div>
+            <div className="flex gap-2 pt-3">
+              <Button className="rounded-2xl" onClick={resetAndClose}>OK</Button>
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
 
-        function cancelAppointment(id) {
-            if (confirm('Termin wirklich stornieren?')) {
-                const data = getData();
-                const apt = data.appointments.find(a => a.id === id);
-                if (apt) apt.status = 'cancelled';
-                saveData(data);
-                loadAdminData();
-            }
-        }
-
-        function moveToAppointment(waitId) {
-            if (confirm('Von Warteliste zu Termin verschieben? (Manuell Zeit zuweisen)')) {
-                const data = getData();
-                const waitItem = data.waitlist.find(w => w.id === waitId);
-                if (waitItem) {
-                    // Simple: Add as pending appointment
-                    data.appointments.push({
-                        ...waitItem,
-                        id: Date.now(),
-                        time: '10:00', // Default; extend with modal
-                        customer: { name: waitItem.email.split('@')[0], email: waitItem.email, phone: '', notes: '' },
-                        status: 'pending',
-                        duration: 30, // Default
-                        buffer: 15,
-                        price: 0 // To be set
-                    });
-                    data.waitlist = data.waitlist.filter(w => w.id !== waitId);
-                    saveData(data);
-                    loadAdminData();
-                }
-            }
-        }
-
-        function deleteWaitlist(id) {
-            if (confirm('Aus Warteliste löschen?')) {
-                const data = getData();
-                data.waitlist = data.waitlist.filter(w => w.id !== id);
-                saveData(data);
-                loadAdminData();
-            }
-        }
-
-        function clearWaitlist() {
-            if (confirm('Gesamte Warteliste leeren?')) {
-                const data = getData();
-                data.waitlist = [];
-                saveData(data);
-                loadAdminData();
-            }
-        }
-
-        function generateInvoice(aptId) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            const data = getData();
-            const apt = data.appointments.find(a => a.id === aptId);
-            if (!apt) return;
-            
-            doc.setFontSize(20);
-            doc.text('🦱 Hair Studio Rechnung', 20, 30);
-            doc.setFontSize(12);
-            doc.text(`Kunde: ${apt.customer.name}`, 20, 50);
-            doc.text(`Service: ${apt.serviceName}`, 20, 60);
-            doc.text(`Datum: ${apt.date} um ${apt.time} Uhr`, 20, 70);
-            doc.text(`Preis: ${apt.price}€`, 20, 80);
-            doc.text(`Mitarbeiter: ${apt.employeeName}`, 20, 90);
-            if (apt.customer.notes) doc.text(`Notizen: ${apt.customer.notes}`, 20, 100);
-            
-            // Simple QR for calendar (placeholder)
-            doc.addImage('data:image/svg+xml;base64,...', 'SVG', 150, 50, 50, 50); // Extend with QR lib if needed
-            
-            doc.save(`rechnung_${aptId}.pdf`);
-        }
-
-        function exportCSV() {
-            const data = getData();
-            let csv = 'Datum,Zeit,Kunde,E-Mail,Telefon,Leistung,Mitarbeiter,Preis,Status\n';
-            
-            data.appointments.forEach(apt => {
-                csv += `"${apt.date}","${apt.time}","${apt.customer.name}","${apt.customer.email}","${apt.customer.phone}","${apt.serviceName}","${apt.employeeName}",${apt.price},"${apt.status}"\n`;
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'termine.csv';
-            a.click();
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('show');
-        }
-
-        // Initialize
-        loadServices();
-    </script>
-</body>
-</html>
+// AdminPanel in Kontakt-Spalte: Kurzinfo + Admin öffnen
+function AdminPanel(){
+  return (
+    <Card className="rounded-2xl">
+      <CardHeader>
+        <CardTitle>Für Inhaber:in</CardTitle>
+        <CardDescription>Kalender & Termine verwalten</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-slate-600 mb-3">Öffne oben im Header den <strong>Admin</strong>-Bereich: Wochenkalender, Terminliste, Services & Einstellungen.</p>
+        <ul className="text-sm list-disc pl-5 text-slate-600">
+          <li>Wöchentliche Kalenderansicht</li>
+          <li>Termin anlegen, bestätigen, absagen</li>
+          <li>Dienstleistungen verwalten</li>
+        </ul>
+      </CardContent>
+    </Card>
+  );
+}
